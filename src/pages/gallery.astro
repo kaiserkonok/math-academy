@@ -1,0 +1,461 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+---
+
+<PublicLayout title="Gallery" description="Photo gallery of Math Solution & Exam Center Mymensingh - Classroom moments, events, students, and facilities">
+
+  <!-- Page Header -->
+  <section class="relative overflow-hidden gradient-bg py-20 lg:py-28">
+    <div class="absolute inset-0">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="absolute inset-0 opacity-[0.03]">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="gallery-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#gallery-grid)"/>
+      </svg>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <span class="inline-block bg-white/10 backdrop-blur-sm text-white/90 text-sm font-semibold px-4 py-2 rounded-full mb-6">Our Moments</span>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6">Our Gallery</h1>
+      <p class="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+        A glimpse into the vibrant life at Math Solution & Exam Center Mymensingh
+      </p>
+    </div>
+  </section>
+
+  <!-- Category Filter -->
+  <section class="section-padding bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-wrap justify-center gap-3 mb-12">
+        <button data-filter="all" class="filter-btn active px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-xl hover:-translate-y-0.5">
+          All
+        </button>
+        <button data-filter="classroom" class="filter-btn px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+          Classroom
+        </button>
+        <button data-filter="events" class="filter-btn px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+          Events
+        </button>
+        <button data-filter="students" class="filter-btn px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+          Students
+        </button>
+        <button data-filter="facilities" class="filter-btn px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+          Facilities
+        </button>
+      </div>
+
+      <!-- Photo Grid -->
+      <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        <!-- 1 - Classroom -->
+        <div class="gallery-item group cursor-pointer" data-category="classroom" data-title="Mathematics Lecture Hall">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Classroom</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Mathematics Lecture Hall</h3>
+              <p class="text-slate-500 text-sm mt-1">Our spacious lecture hall with modern teaching aids</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 - Events -->
+        <div class="gallery-item group cursor-pointer" data-category="events" data-title="Annual Math Olympiad">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-amber-400 to-orange-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Events</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Annual Math Olympiad</h3>
+              <p class="text-slate-500 text-sm mt-1">Students competing in our yearly math competition</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 - Students -->
+        <div class="gallery-item group cursor-pointer" data-category="students" data-title="Group Study Session">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-emerald-400 to-green-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Students</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Group Study Session</h3>
+              <p class="text-slate-500 text-sm mt-1">Students collaborating on problem-solving exercises</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 - Facilities -->
+        <div class="gallery-item group cursor-pointer" data-category="facilities" data-title="Math Resource Library">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-violet-400 to-purple-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-violet-100 text-violet-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Facilities</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Math Resource Library</h3>
+              <p class="text-slate-500 text-sm mt-1">Our extensive collection of math books and resources</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 - Classroom -->
+        <div class="gallery-item group cursor-pointer" data-category="classroom" data-title="Smart Board Teaching">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-cyan-400 to-blue-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Classroom</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Smart Board Teaching</h3>
+              <p class="text-slate-500 text-sm mt-1">Interactive learning with digital smart boards</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 - Events -->
+        <div class="gallery-item group cursor-pointer" data-category="events" data-title="Result Celebration">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-rose-400 to-pink-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Events</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Result Celebration</h3>
+              <p class="text-slate-500 text-sm mt-1">Celebrating outstanding SSC & HSC results</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 - Students -->
+        <div class="gallery-item group cursor-pointer" data-category="students" data-title="Award Ceremony">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-teal-400 to-cyan-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Students</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Award Ceremony</h3>
+              <p class="text-slate-500 text-sm mt-1">Honoring top performers with merit certificates</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 - Facilities -->
+        <div class="gallery-item group cursor-pointer" data-category="facilities" data-title="Computer Lab">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-indigo-400 to-blue-600 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-violet-100 text-violet-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Facilities</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Computer Lab</h3>
+              <p class="text-slate-500 text-sm mt-1">Equipped with computers for online test practice</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9 - Classroom -->
+        <div class="gallery-item group cursor-pointer" data-category="classroom" data-title="One-on-One Tutoring">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-lime-400 to-green-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Classroom</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">One-on-One Tutoring</h3>
+              <p class="text-slate-500 text-sm mt-1">Personalized attention for every student</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 - Events -->
+        <div class="gallery-item group cursor-pointer" data-category="events" data-title="Parents Meeting">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-fuchsia-400 to-pink-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Events</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Parents Meeting</h3>
+              <p class="text-slate-500 text-sm mt-1">Regular parent-teacher conferences for progress updates</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11 - Students -->
+        <div class="gallery-item group cursor-pointer" data-category="students" data-title="Science Fair Project">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-sky-400 to-blue-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Students</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Science Fair Project</h3>
+              <p class="text-slate-500 text-sm mt-1">Students presenting math-based science projects</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 - Facilities -->
+        <div class="gallery-item group cursor-pointer" data-category="facilities" data-title="Comfortable Classroom">
+          <div class="card overflow-hidden hover:-translate-y-1 transition-all duration-300">
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-red-400 to-rose-500 overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="bg-white/90 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm">View Full Size</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <span class="inline-block bg-violet-100 text-violet-700 text-xs font-semibold px-2.5 py-1 rounded-full mb-2">Facilities</span>
+              <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">Comfortable Classroom</h3>
+              <p class="text-slate-500 text-sm mt-1">Air-conditioned rooms with ergonomic seating</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- No Results Message -->
+      <div id="no-results" class="hidden text-center py-16">
+        <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">No photos found</h3>
+        <p class="text-slate-500">Try selecting a different category</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+    <button id="lightbox-close" class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <button id="lightbox-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button id="lightbox-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div id="lightbox-content" class="relative max-w-4xl w-full">
+      <div id="lightbox-image" class="w-full aspect-video rounded-2xl flex items-center justify-center mb-4">
+        <svg class="w-20 h-20 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <div class="text-center">
+        <h3 id="lightbox-title" class="text-xl font-bold text-white mb-1"></h3>
+        <p id="lightbox-category" class="text-white/60 text-sm"></p>
+        <p id="lightbox-counter" class="text-white/40 text-sm mt-2"></p>
+      </div>
+    </div>
+  </div>
+
+</PublicLayout>
+
+<script is:inline>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+  const noResults = document.getElementById('no-results');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImage = document.getElementById('lightbox-image');
+  const lightboxTitle = document.getElementById('lightbox-title');
+  const lightboxCategory = document.getElementById('lightbox-category');
+  const lightboxCounter = document.getElementById('lightbox-counter');
+  const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+
+  let currentFilter = 'all';
+  let currentIndex = 0;
+  let visibleItems = [];
+
+  const gradients = [
+    'bg-gradient-to-br from-blue-400 to-blue-600',
+    'bg-gradient-to-br from-amber-400 to-orange-500',
+    'bg-gradient-to-br from-emerald-400 to-green-600',
+    'bg-gradient-to-br from-violet-400 to-purple-600',
+    'bg-gradient-to-br from-cyan-400 to-blue-500',
+    'bg-gradient-to-br from-rose-400 to-pink-600',
+    'bg-gradient-to-br from-teal-400 to-cyan-600',
+    'bg-gradient-to-br from-indigo-400 to-blue-600',
+    'bg-gradient-to-br from-lime-400 to-green-500',
+    'bg-gradient-to-br from-fuchsia-400 to-pink-500',
+    'bg-gradient-to-br from-sky-400 to-blue-500',
+    'bg-gradient-to-br from-red-400 to-rose-500',
+  ];
+
+  function getGradient(index) {
+    return gradients[index % gradients.length];
+  }
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      currentFilter = (btn).dataset.filter || 'all';
+
+      filterBtns.forEach((b) => {
+        b.classList.remove('bg-primary-600', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+        b.classList.add('bg-slate-100', 'text-slate-600');
+      });
+      btn.classList.add('bg-primary-600', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+      btn.classList.remove('bg-slate-100', 'text-slate-600');
+
+      let visibleCount = 0;
+      galleryItems.forEach((item) => {
+        const el = item;
+        const category = el.dataset.category;
+        if (currentFilter === 'all' || category === currentFilter) {
+          el.style.display = '';
+          visibleCount++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      if (noResults) {
+        noResults.classList.toggle('hidden', visibleCount > 0);
+      }
+    });
+  });
+
+  function updateVisibleItems() {
+    visibleItems = Array.from(galleryItems).filter(
+      (item) => (item).style.display !== 'none'
+    );
+  }
+
+  function openLightbox(index) {
+    updateVisibleItems();
+    currentIndex = index;
+    renderLightbox();
+    lightbox?.classList.remove('hidden');
+    lightbox?.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox?.classList.add('hidden');
+    lightbox?.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  function renderLightbox() {
+    const item = visibleItems[currentIndex];
+    if (!item) return;
+
+    const title = item.dataset.title || '';
+    const category = item.dataset.category || '';
+    const gradient = getGradient(currentIndex);
+
+    if (lightboxImage) {
+      lightboxImage.className = `w-full aspect-video rounded-2xl flex items-center justify-center mb-4 ${gradient}`;
+    }
+    if (lightboxTitle) lightboxTitle.textContent = title;
+    if (lightboxCategory) lightboxCategory.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+    if (lightboxCounter) lightboxCounter.textContent = `${currentIndex + 1} / ${visibleItems.length}`;
+  }
+
+  galleryItems.forEach((item, i) => {
+    item.addEventListener('click', () => {
+      updateVisibleItems();
+      const globalIndex = visibleItems.indexOf(item);
+      if (globalIndex !== -1) {
+        openLightbox(globalIndex);
+      }
+    });
+  });
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  lightboxPrev?.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+    renderLightbox();
+  });
+
+  lightboxNext?.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % visibleItems.length;
+    renderLightbox();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox || lightbox.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') {
+      currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+      renderLightbox();
+    }
+    if (e.key === 'ArrowRight') {
+      currentIndex = (currentIndex + 1) % visibleItems.length;
+      renderLightbox();
+    }
+  });
+</script>

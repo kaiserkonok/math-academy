@@ -1,0 +1,355 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+
+const classes = [
+  {
+    grade: 5,
+    name: "Grade 5 Mathematics",
+    description: "Building strong foundations in arithmetic, geometry basics, and problem-solving skills for young learners.",
+    topics: ["Fractions & Decimals", "Basic Geometry", "Measurement", "Number Patterns", "Data Handling"],
+    schedule: "Sat, Mon, Wed | 4:00 PM - 5:30 PM",
+    color: "from-primary-500 to-primary-700",
+    shadow: "shadow-primary-500/25",
+    badge: "bg-primary-100 text-primary-700",
+    subtitle: "Foundation Building"
+  },
+  {
+    grade: 6,
+    name: "Grade 6 Mathematics",
+    description: "Developing core mathematical concepts including integers, fractions, and introductory algebra.",
+    topics: ["Integers", "Algebra Basics", "Ratio & Proportion", "Geometry", "Mensuration"],
+    schedule: "Sat, Mon, Wed | 5:30 PM - 7:00 PM",
+    color: "from-secondary-500 to-secondary-700",
+    shadow: "shadow-secondary-500/25",
+    badge: "bg-secondary-100 text-secondary-700",
+    subtitle: "Core Concepts"
+  },
+  {
+    grade: 7,
+    name: "Grade 7 Mathematics",
+    description: "Strengthening mathematical reasoning with advanced algebra, geometry, and trigonometry introduction.",
+    topics: ["Linear Equations", "Triangles & Properties", "Symmetry", "Data Science", "Rational Numbers"],
+    schedule: "Sat, Tue, Thu | 4:00 PM - 5:30 PM",
+    color: "from-accent-500 to-cyan-600",
+    shadow: "shadow-accent-500/25",
+    badge: "bg-accent-100 text-accent-700",
+    subtitle: "Skill Development"
+  },
+  {
+    grade: 8,
+    name: "Grade 8 Mathematics",
+    description: "Mastering advanced topics in algebra, geometry, and statistics for board exam preparation.",
+    topics: ["Quadrilaterals", "Square Roots", "Exponents", "Factorization", "Commercial Math"],
+    schedule: "Sat, Tue, Thu | 5:30 PM - 7:00 PM",
+    color: "from-success-500 to-emerald-600",
+    shadow: "shadow-success-500/25",
+    badge: "bg-success-100 text-success-700",
+    subtitle: "Advanced Topics"
+  },
+  {
+    grade: 9,
+    name: "Grade 9 Mathematics",
+    description: "Comprehensive preparation for SSC exams with in-depth coverage of all board syllabus topics.",
+    topics: ["Real Numbers", "Polynomials", "Coordinate Geometry", "Statistics", "Probability"],
+    schedule: "Sat, Sun, Tue, Thu | 4:00 PM - 5:30 PM",
+    color: "from-amber-500 to-orange-600",
+    shadow: "shadow-amber-500/25",
+    badge: "bg-amber-100 text-amber-700",
+    subtitle: "Exam Preparation"
+  },
+  {
+    grade: 10,
+    name: "Grade 10 Mathematics",
+    description: "Final SSC preparation with intensive practice, model tests, and exam strategies for maximum results.",
+    topics: ["Sets & Functions", "Geometry", "Trigonometry", "Mensuration", "Higher Algebra"],
+    schedule: "Sat, Sun, Tue, Thu, Fri | 4:00 PM - 6:00 PM",
+    color: "from-pink-500 to-rose-600",
+    shadow: "shadow-pink-500/25",
+    badge: "bg-pink-100 text-pink-700",
+    subtitle: "Final Success"
+  }
+];
+
+const faqs = [
+  {
+    question: "What is the admission process?",
+    answer: "Visit our center or fill out the online admission form. You'll need a copy of your previous academic records and a passport-size photo. Enrollment can be completed within 24 hours."
+  },
+  {
+    question: "What are the class timings?",
+    answer: "Classes are held 3-5 days per week depending on your grade. Each session is 1.5 hours. We offer both morning and evening batches to accommodate different schedules."
+  },
+  {
+    question: "Do you provide study materials?",
+    answer: "Yes, all enrolled students receive comprehensive study materials, practice sheets, and access to our online question bank at no additional cost."
+  },
+  {
+    question: "How are the model tests conducted?",
+    answer: "Model tests are conducted monthly following the official board exam format. Results are analyzed and shared with detailed performance reports and improvement suggestions."
+  },
+  {
+    question: "Is there a trial class available?",
+    answer: "Yes, we offer a free trial class for new students. Contact us to schedule your trial session and experience our teaching methodology firsthand."
+  },
+  {
+    question: "What is the student-to-teacher ratio?",
+    answer: "We maintain a small class size of 25-30 students per batch to ensure personalized attention and effective learning for every student."
+  }
+];
+---
+
+<PublicLayout title="Our Classes" description="Explore our comprehensive mathematics classes for grades 5-10 at Math Solution & Exam Center Mymensingh. Expert teachers, proven methods, and excellent results.">
+
+  <!-- Page Header -->
+  <section class="relative gradient-bg py-20 lg:py-28 overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-white mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        Grades 5 - 10
+      </span>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6">
+        Our <span class="bg-gradient-to-r from-accent-300 to-secondary-300 bg-clip-text text-transparent">Classes</span>
+      </h1>
+      <p class="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+        Comprehensive mathematics coaching for students from Grade 5 to 10. Expert teachers, proven methods, and a commitment to your success.
+      </p>
+    </div>
+  </section>
+
+  <!-- Grade Filter -->
+  <section class="section-padding bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-wrap justify-center gap-3" id="grade-filter">
+        <button data-grade="all" class="grade-btn active px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-primary-600 text-white shadow-lg shadow-primary-500/25">
+          All Grades
+        </button>
+        {[5,6,7,8,9,10].map((g) => (
+          <button data-grade={g} class="grade-btn px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200">
+            Grade {g}
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Classes Grid -->
+  <section class="section-padding bg-slate-50">
+    <div class="max-w-7xl mx-auto">
+      <div id="classes-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {classes.map((cls) => (
+          <div class="card p-0 overflow-hidden group hover:-translate-y-2 hover:shadow-xl transition-all duration-300" data-grade={cls.grade} id={`grade-${cls.grade}`}>
+            <div class={`bg-gradient-to-r ${cls.color} p-6 relative overflow-hidden`}>
+              <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
+              <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
+              <div class="relative flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <span class="text-white font-extrabold text-3xl">{cls.grade}</span>
+                </div>
+                <div>
+                  <span class={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white mb-1`}>
+                    {cls.subtitle}
+                  </span>
+                  <h3 class="text-xl font-bold text-white">{cls.name}</h3>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <p class="text-slate-600 leading-relaxed">{cls.description}</p>
+
+              <div>
+                <h4 class="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                  Topics Covered
+                </h4>
+                <div class="flex flex-wrap gap-2">
+                  {cls.topics.map((topic) => (
+                    <span class={`${cls.badge} px-3 py-1 rounded-lg text-xs font-medium`}>
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                <svg class="w-5 h-5 text-slate-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                  <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Schedule</span>
+                  <p class="text-sm font-medium text-slate-700 mt-0.5">{cls.schedule}</p>
+                </div>
+              </div>
+
+              <a href="/admission" class={`w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r ${cls.color} text-white px-6 py-3 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity shadow-lg ${cls.shadow}`}>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Enroll Now
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Model Tests Section -->
+  <section class="section-padding bg-white" id="model-test">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">Assessments</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Model Tests & <span class="gradient-text">Series Exams</span>
+        </h2>
+        <p class="text-slate-500 mt-4 text-lg">Regular assessments to track progress and build exam confidence</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="card p-8 text-center group hover:-translate-y-1">
+          <div class="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-primary-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Monthly Model Tests</h3>
+          <p class="text-slate-500 leading-relaxed">Full-length board-format exams conducted every month to evaluate understanding and readiness.</p>
+        </div>
+
+        <div class="card p-8 text-center group hover:-translate-y-1">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary-500 to-secondary-700 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-secondary-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Performance Analytics</h3>
+          <p class="text-slate-500 leading-relaxed">Detailed result analysis with subject-wise breakdowns and personalized improvement strategies.</p>
+        </div>
+
+        <div class="card p-8 text-center group hover:-translate-y-1">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-success-500 to-emerald-600 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-success-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Series Exams</h3>
+          <p class="text-slate-500 leading-relaxed">Comprehensive series exams covering the full syllabus, simulating real board exam conditions.</p>
+        </div>
+      </div>
+
+      <div class="mt-12 card-glass p-8 flex flex-col md:flex-row items-center gap-8">
+        <div class="flex-1">
+          <h3 class="text-2xl font-bold text-slate-900 mb-3">Exam Statistics</h3>
+          <p class="text-slate-500 mb-6">Our students consistently perform above district averages in board examinations.</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-slate-50 rounded-xl">
+              <div class="text-2xl font-extrabold gradient-text">95%</div>
+              <div class="text-xs text-slate-500 mt-1">Pass Rate</div>
+            </div>
+            <div class="text-center p-4 bg-slate-50 rounded-xl">
+              <div class="text-2xl font-extrabold gradient-text">82%</div>
+              <div class="text-xs text-slate-500 mt-1">A+ Holders</div>
+            </div>
+            <div class="text-center p-4 bg-slate-50 rounded-xl">
+              <div class="text-2xl font-extrabold gradient-text">500+</div>
+              <div class="text-xs text-slate-500 mt-1">Students Yearly</div>
+            </div>
+          </div>
+        </div>
+        <div class="w-full md:w-px md:h-48 bg-slate-200 hidden md:block"></div>
+        <div class="flex-1 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 bg-success-100 text-success-700 rounded-full px-4 py-2 text-sm font-semibold mb-4">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            2025 Results
+          </div>
+          <h4 class="text-lg font-bold text-slate-900 mb-2">SSC Examination 2025</h4>
+          <p class="text-slate-500 text-sm leading-relaxed">Our Grade 10 students achieved remarkable results with the highest GPA 5.0 rate in the district.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section-padding bg-slate-50">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16">
+        <span class="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">FAQ</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Frequently Asked <span class="gradient-text">Questions</span>
+        </h2>
+        <p class="text-slate-500 mt-4 text-lg">Everything you need to know about our classes</p>
+      </div>
+
+      <div class="space-y-4" id="faq-list">
+        {faqs.map((faq, i) => (
+          <div class="card overflow-hidden">
+            <button class="faq-toggle w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors" data-faq={i}>
+              <span class="font-semibold text-slate-900 pr-4">{faq.question}</span>
+              <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-slate-600 leading-relaxed">{faq.answer}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-padding gradient-bg relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6">Ready to Start Learning?</h2>
+      <p class="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+        Join Math Academy today and take the first step toward mathematical excellence. Admissions are now open for all grades.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/admission" class="inline-flex items-center gap-2 bg-white text-primary-700 px-10 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Enroll Now
+        </a>
+        <a href="/contact" class="inline-flex items-center gap-2 border-2 border-white/30 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Ask a Question
+        </a>
+      </div>
+    </div>
+  </section>
+
+</PublicLayout>
+
+<script is:inline>
+  const gradeButtons = document.querySelectorAll('.grade-btn');
+  const classCards = document.querySelectorAll('[data-grade]');
+  const faqToggles = document.querySelectorAll('.faq-toggle');
+
+  gradeButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const grade = btn.getAttribute('data-grade');
+
+      gradeButtons.forEach((b) => {
+        b.classList.remove('bg-primary-600', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+        b.classList.add('bg-slate-100', 'text-slate-600');
+      });
+      btn.classList.add('bg-primary-600', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+      btn.classList.remove('bg-slate-100', 'text-slate-600');
+
+      classCards.forEach((card) => {
+        if (card.classList.contains('card')) {
+          if (grade === 'all' || card.getAttribute('data-grade') === grade) {
+            (card).style.display = '';
+          } else {
+            (card).style.display = 'none';
+          }
+        }
+      });
+    });
+  });
+
+  faqToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const answer = toggle.nextElementSibling;
+      const icon = toggle.querySelector('svg');
+      answer?.classList.toggle('hidden');
+      icon?.classList.toggle('rotate-180');
+    });
+  });
+</script>

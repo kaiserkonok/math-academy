@@ -1,0 +1,357 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+const results = [
+  { id: 'RES-001', studentName: 'Tanvir Hossain', studentId: 'STU-2024-001', examTitle: 'Class 10 Model Test 1', grade: 10, totalMarks: 100, obtainedMarks: 87, percentage: 87, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-002', studentName: 'Fatema Khatun', studentId: 'STU-2024-002', examTitle: 'Class 10 Mock Exam 2', grade: 9, totalMarks: 100, obtainedMarks: 92, percentage: 92, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-003', studentName: 'Rakibul Hasan', studentId: 'STU-2024-003', examTitle: 'Class 10 Model Test 1', grade: 10, totalMarks: 100, obtainedMarks: 64, percentage: 64, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-004', studentName: 'Nusrat Jahan', studentId: 'STU-2024-004', examTitle: 'Class 9 Weekly Test 5', grade: 8, totalMarks: 100, obtainedMarks: 38, percentage: 38, status: 'fail', published: false, date: '2025-09-08' },
+  { id: 'RES-005', studentName: 'Imran Hossain', studentId: 'STU-2024-005', examTitle: 'Class 10 Mock Exam 2', grade: 9, totalMarks: 100, obtainedMarks: 76, percentage: 76, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-006', studentName: 'Sumaiya Akter', studentId: 'STU-2024-006', examTitle: 'Class 9 Weekly Test 5', grade: 10, totalMarks: 100, obtainedMarks: 95, percentage: 95, status: 'pass', published: true, date: '2025-09-08' },
+  { id: 'RES-007', studentName: 'Arif Rahman', studentId: 'STU-2024-007', examTitle: 'Class 10 Mock Exam 2', grade: 8, totalMarks: 100, obtainedMarks: 55, percentage: 55, status: 'fail', published: false, date: '2025-09-10' },
+  { id: 'RES-008', studentName: 'Tamanna Begum', studentId: 'STU-2024-008', examTitle: 'Class 10 Model Test 1', grade: 9, totalMarks: 100, obtainedMarks: 71, percentage: 71, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-009', studentName: 'Sakib Al Hasan', studentId: 'STU-2024-009', examTitle: 'Class 10 Mock Exam 2', grade: 10, totalMarks: 100, obtainedMarks: 83, percentage: 83, status: 'pass', published: true, date: '2025-09-10' },
+  { id: 'RES-010', studentName: 'Mst. Rabeya Khatun', studentId: 'STU-2024-010', examTitle: 'Class 9 Weekly Test 5', grade: 9, totalMarks: 100, obtainedMarks: 42, percentage: 42, status: 'fail', published: false, date: '2025-09-08' },
+];
+
+const totalResults = results.length;
+const avgScore = Math.round(results.reduce((a, b) => a + b.percentage, 0) / results.length);
+const passRate = Math.round((results.filter(r => r.status === 'pass').length / totalResults) * 100);
+const highestScore = Math.max(...results.map(r => r.percentage));
+---
+
+<AdminLayout title="Result Management">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Result Management</h1>
+      <p class="text-slate-500 mt-1">Manage exam results for Math Solution & Exam Center Mymensingh</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Export PDF
+      </button>
+      <button class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 rounded-xl shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/30 transition-all duration-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card p-5">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500">Total Results</p>
+          <p class="text-2xl font-bold text-slate-900">{totalResults}</p>
+        </div>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500">Average Score</p>
+          <p class="text-2xl font-bold text-slate-900">{avgScore}%</p>
+        </div>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500">Pass Rate</p>
+          <p class="text-2xl font-bold text-slate-900">{passRate}%</p>
+        </div>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-500">Highest Score</p>
+          <p class="text-2xl font-bold text-slate-900">{highestScore}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="card p-5 mb-6">
+    <div class="flex flex-col lg:flex-row gap-4">
+      <div class="flex-1 relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search by student name, ID, or exam..."
+          class="input-field pl-10"
+          id="searchInput"
+          oninput="filterResults()"
+        />
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <select class="input-field w-full sm:w-40" id="examFilter" onchange="filterResults()">
+          <option value="">All Exams</option>
+          <option value="Class 10 Model Test 1">Class 10 Model Test 1</option>
+          <option value="Class 9 Weekly Test 5">Class 9 Weekly Test 5</option>
+          <option value="Class 10 Mock Exam 2">Class 10 Mock Exam 2</option>
+        </select>
+        <select class="input-field w-full sm:w-36" id="gradeFilter" onchange="filterResults()">
+          <option value="">All Grades</option>
+          <option value="5">Class 5</option>
+          <option value="6">Class 6</option>
+          <option value="7">Class 7</option>
+          <option value="8">Class 8</option>
+          <option value="9">Class 9</option>
+          <option value="10">Class 10</option>
+        </select>
+        <input type="date" class="input-field w-full sm:w-40" id="dateFilter" onchange="filterResults()" />
+        <select class="input-field w-full sm:w-36" id="statusFilter" onchange="filterResults()">
+          <option value="">All Status</option>
+          <option value="pass">Pass</option>
+          <option value="fail">Fail</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div id="bulkActions" class="hidden card p-4 mb-6 bg-primary-50 border-primary-200">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-primary-700" id="selectedCount">0 selected</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="bulkPublish()" class="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors">
+          Publish All
+        </button>
+        <button onclick="bulkExportPdf()" class="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
+          Export to PDF
+        </button>
+        <button onclick="bulkExportExcel()" class="px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-100 rounded-lg hover:bg-emerald-200 transition-colors">
+          Export to Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div class="card overflow-hidden mb-6">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-100">
+            <th class="px-5 py-4 text-left">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer" />
+            </th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Student Name</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Student ID</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Exam Title</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Marks</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Percentage</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Published</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTableBody" class="divide-y divide-slate-100">
+          {results.map((result) => (
+            <tr class="hover:bg-slate-50 transition-colors" data-exam={result.examTitle} data-grade={result.grade} data-status={result.status} data-date={result.date} data-published={result.published}>
+              <td class="px-5 py-4">
+                <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer" onchange="updateBulkActions()" />
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-500 flex items-center justify-center text-white text-sm font-semibold shadow-sm">
+                    {result.studentName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <span class="font-medium text-slate-900">{result.studentName}</span>
+                </div>
+              </td>
+              <td class="px-5 py-4 text-sm font-mono text-slate-600">{result.studentId}</td>
+              <td class="px-5 py-4 text-sm text-slate-600">{result.examTitle}</td>
+              <td class="px-5 py-4">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-secondary-100 text-secondary-700">
+                  {result.grade}
+                </span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="text-sm font-semibold text-slate-900">{result.obtainedMarks}</span>
+                <span class="text-sm text-slate-400">/{result.totalMarks}</span>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      class={`h-full rounded-full ${result.percentage >= 80 ? 'bg-green-500' : result.percentage >= 50 ? 'bg-blue-500' : 'bg-red-500'}`}
+                      style={`width: ${result.percentage}%`}
+                    ></div>
+                  </div>
+                  <span class="text-sm font-semibold text-slate-900">{result.percentage}%</span>
+                </div>
+              </td>
+              <td class="px-5 py-4">
+                {result.status === 'pass' ? (
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Pass
+                  </span>
+                ) : (
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    Fail
+                  </span>
+                )}
+              </td>
+              <td class="px-5 py-4">
+                {result.published ? (
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">
+                    Yes
+                  </span>
+                ) : (
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600">
+                    No
+                  </span>
+                )}
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-1">
+                  <button title="View" class="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <button title={result.published ? "Unpublish" : "Publish"} class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                    {result.published ? (
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                    ) : (
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                  <button title="Delete" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-10</span> of <span class="font-semibold text-slate-700">{totalResults}</span> results</p>
+    <div class="flex items-center gap-1">
+      <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
+      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">2</button>
+      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">3</button>
+      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script is:inline>
+    function filterResults() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const exam = document.getElementById('examFilter').value;
+      const grade = document.getElementById('gradeFilter').value;
+      const date = document.getElementById('dateFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const rows = document.querySelectorAll('#resultsTableBody tr');
+      rows.forEach(row => {
+        const el = row;
+        const name = el.querySelector('td:nth-child(2)')?.textContent?.toLowerCase() || '';
+        const id = el.querySelector('td:nth-child(3)')?.textContent?.toLowerCase() || '';
+        const examTitle = el.dataset.exam || '';
+        const rowGrade = el.dataset.grade || '';
+        const rowDate = el.dataset.date || '';
+        const rowStatus = el.dataset.status || '';
+        const matchSearch = !search || name.includes(search) || id.includes(search);
+        const matchExam = !exam || examTitle === exam;
+        const matchGrade = !grade || rowGrade === grade;
+        const matchDate = !date || rowDate === date;
+        const matchStatus = !status || rowStatus === status;
+        el.style.display = matchSearch && matchExam && matchGrade && matchDate && matchStatus ? '' : 'none';
+      });
+    }
+
+    function toggleSelectAll() {
+      const checked = document.getElementById('selectAll').checked;
+      document.querySelectorAll('.row-checkbox').forEach(cb => {
+        cb.checked = checked;
+      });
+      updateBulkActions();
+    }
+
+    function updateBulkActions() {
+      const checked = document.querySelectorAll('.row-checkbox:checked').length;
+      const bulkBar = document.getElementById('bulkActions');
+      const countEl = document.getElementById('selectedCount');
+      if (checked > 0) {
+        bulkBar?.classList.remove('hidden');
+        countEl.textContent = `${checked} selected`;
+      } else {
+        bulkBar?.classList.add('hidden');
+      }
+    }
+
+    function bulkPublish() {
+      const count = document.querySelectorAll('.row-checkbox:checked').length;
+      alert(`${count} result(s) published successfully!`);
+    }
+
+    function bulkExportPdf() {
+      const count = document.querySelectorAll('.row-checkbox:checked').length;
+      alert(`Exporting ${count} result(s) to PDF...`);
+    }
+
+    function bulkExportExcel() {
+      const count = document.querySelectorAll('.row-checkbox:checked').length;
+      alert(`Exporting ${count} result(s) to Excel...`);
+    }
+  </script>
+</AdminLayout>

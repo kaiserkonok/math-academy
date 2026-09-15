@@ -1,0 +1,383 @@
+---
+import StudentLayout from '../../../layouts/StudentLayout.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { id: '1' } },
+    { params: { id: '2' } },
+    { params: { id: '3' } },
+    { params: { id: '4' } },
+    { params: { id: '5' } },
+    { params: { id: '6' } },
+    { params: { id: '7' } },
+    { params: { id: '8' } }
+  ];
+}
+
+const { id } = Astro.params;
+
+const studentName = 'Rafiq Ahmed';
+
+const results: Record<string, any> = {
+  '1': {
+    examName: 'Algebra - Chapter 5 Test',
+    date: 'September 10, 2026',
+    totalQuestions: 20,
+    correctAnswers: 17,
+    wrongAnswers: 2,
+    skipped: 1,
+    totalMarks: 100,
+    obtainedMarks: 85,
+    percentage: 85,
+    status: 'Pass',
+    timeTaken: '1h 15m',
+    questions: [
+      { id: 1, text: 'Solve for x: 2x + 5 = 15', yourAnswer: 'x = 5', correctAnswer: 'x = 5', marks: 5, status: 'correct' },
+      { id: 2, text: 'Factorize: x² - 9', yourAnswer: '(x+3)(x-3)', correctAnswer: '(x+3)(x-3)', marks: 5, status: 'correct' },
+      { id: 3, text: 'Simplify: (3x²)(2x³)', yourAnswer: '6x⁵', correctAnswer: '6x⁵', marks: 5, status: 'correct' },
+      { id: 4, text: 'Solve the inequality: 3x - 7 > 5', yourAnswer: 'x > 4', correctAnswer: 'x > 4', marks: 5, status: 'correct' },
+      { id: 5, text: 'Find the value of x: log₂(x) = 3', yourAnswer: 'x = 8', correctAnswer: 'x = 8', marks: 5, status: 'correct' },
+      { id: 6, text: 'Simplify: (x² + 2x + 1)/(x + 1)', yourAnswer: 'x + 1', correctAnswer: 'x + 1', marks: 5, status: 'correct' },
+      { id: 7, text: 'Solve: x² - 5x + 6 = 0', yourAnswer: 'x = 2, 3', correctAnswer: 'x = 2, 3', marks: 5, status: 'correct' },
+      { id: 8, text: 'Find the HCF of 24 and 36', yourAnswer: '12', correctAnswer: '12', marks: 5, status: 'correct' },
+      { id: 9, text: 'Simplify: √(49x²)', yourAnswer: '7x', correctAnswer: '7|x|', marks: 5, status: 'wrong' },
+      { id: 10, text: 'Solve: |2x - 3| = 7', yourAnswer: 'x = 5, -2', correctAnswer: 'x = 5, -2', marks: 5, status: 'correct' },
+      { id: 11, text: 'If f(x) = 2x + 1, find f(3)', yourAnswer: '7', correctAnswer: '7', marks: 5, status: 'correct' },
+      { id: 12, text: 'Find the domain of f(x) = 1/(x-2)', yourAnswer: 'x ≠ 2', correctAnswer: 'x ≠ 2', marks: 5, status: 'correct' },
+      { id: 13, text: 'Solve: 2^x = 32', yourAnswer: 'x = 5', correctAnswer: 'x = 5', marks: 5, status: 'correct' },
+      { id: 14, text: 'Simplify: (x³)²', yourAnswer: 'x⁶', correctAnswer: 'x⁶', marks: 5, status: 'correct' },
+      { id: 15, text: 'Find the LCM of 12 and 18', yourAnswer: '36', correctAnswer: '36', marks: 5, status: 'correct' },
+      { id: 16, text: 'Solve: (x/2) + 3 = 7', yourAnswer: 'x = 8', correctAnswer: 'x = 8', marks: 5, status: 'correct' },
+      { id: 17, text: 'Simplify: 2³ × 2⁴', yourAnswer: '2⁷', correctAnswer: '2⁷', marks: 5, status: 'correct' },
+      { id: 18, text: 'If f(x) = x², find f(-3)', yourAnswer: '9', correctAnswer: '9', marks: 5, status: 'correct' },
+      { id: 19, text: 'Solve: √(x) = 5', yourAnswer: 'x = 25', correctAnswer: 'x = 25', marks: 5, status: 'correct' },
+      { id: 20, text: 'Simplify: (x⁴)/(x²)', yourAnswer: 'x²', correctAnswer: 'x²', marks: 5, status: 'correct' }
+    ]
+  },
+  '2': {
+    examName: 'Calculus - Midterm',
+    date: 'September 5, 2026',
+    totalQuestions: 25,
+    correctAnswers: 18,
+    wrongAnswers: 4,
+    skipped: 3,
+    totalMarks: 100,
+    obtainedMarks: 72,
+    percentage: 72,
+    status: 'Pass',
+    timeTaken: '1h 45m',
+    questions: [
+      { id: 1, text: 'Find the derivative of f(x) = x³', yourAnswer: '3x²', correctAnswer: '3x²', marks: 4, status: 'correct' },
+      { id: 2, text: 'Evaluate: lim(x→0) sin(x)/x', yourAnswer: '1', correctAnswer: '1', marks: 4, status: 'correct' },
+      { id: 3, text: 'Find the integral of 2x dx', yourAnswer: 'x² + C', correctAnswer: 'x² + C', marks: 4, status: 'correct' },
+      { id: 4, text: 'Find the derivative of eˣ', yourAnswer: 'eˣ', correctAnswer: 'eˣ', marks: 4, status: 'correct' },
+      { id: 5, text: 'Evaluate: d/dx(ln(x))', yourAnswer: '1/x', correctAnswer: '1/x', marks: 4, status: 'correct' },
+      { id: 6, text: 'Find ∫(3x² + 2x) dx', yourAnswer: 'x³ + x² + C', correctAnswer: 'x³ + x² + C', marks: 4, status: 'correct' },
+      { id: 7, text: 'Find the derivative of sin(x)', yourAnswer: 'cos(x)', correctAnswer: 'cos(x)', marks: 4, status: 'correct' },
+      { id: 8, text: 'Evaluate: lim(x→∞) 1/x', yourAnswer: '0', correctAnswer: '0', marks: 4, status: 'correct' },
+      { id: 9, text: 'Find ∫cos(x) dx', yourAnswer: 'sin(x) + C', correctAnswer: 'sin(x) + C', marks: 4, status: 'correct' },
+      { id: 10, text: 'Find the derivative of tan(x)', yourAnswer: 'sec²(x)', correctAnswer: 'sec²(x)', marks: 4, status: 'correct' },
+      { id: 11, text: 'Evaluate: d/dx(x²eˣ)', yourAnswer: '2xeˣ + x²eˣ', correctAnswer: '2xeˣ + x²eˣ', marks: 4, status: 'correct' },
+      { id: 12, text: 'Find ∫(1/x) dx', yourAnswer: 'ln|x| + C', correctAnswer: 'ln|x| + C', marks: 4, status: 'correct' },
+      { id: 13, text: 'Find the derivative of cos(x)', yourAnswer: '-sin(x)', correctAnswer: '-sin(x)', marks: 4, status: 'correct' },
+      { id: 14, text: 'Evaluate: lim(x→0) (eˣ-1)/x', yourAnswer: '1', correctAnswer: '1', marks: 4, status: 'correct' },
+      { id: 15, text: 'Find ∫eˣ dx', yourAnswer: 'eˣ + C', correctAnswer: 'eˣ + C', marks: 4, status: 'correct' },
+      { id: 16, text: 'Find the derivative of x²sin(x)', yourAnswer: '2xsin(x) + x²cos(x)', correctAnswer: '2xsin(x) + x²cos(x)', marks: 4, status: 'correct' },
+      { id: 17, text: 'Find ∫sec²(x) dx', yourAnswer: 'tan(x) + C', correctAnswer: 'tan(x) + C', marks: 4, status: 'correct' },
+      { id: 18, text: 'Evaluate: d/dx(ln(x²))', yourAnswer: '2/x', correctAnswer: '2/x', marks: 4, status: 'correct' },
+      { id: 19, text: 'Find the derivative of xˣ', yourAnswer: 'xˣ(1+ln(x))', correctAnswer: 'xˣ(1+ln(x))', marks: 4, status: 'correct' },
+      { id: 20, text: 'Evaluate: lim(x→0) (1-cos(x))/x²', yourAnswer: '1/2', correctAnswer: '1/2', marks: 4, status: 'correct' },
+      { id: 21, text: 'Find ∫sin(x)/cos²(x) dx', yourAnswer: 'sec(x) + C', correctAnswer: 'sec(x) + C', marks: 4, status: 'correct' },
+      { id: 22, text: 'Find the derivative of sin⁻¹(x)', yourAnswer: '1/√(1-x²)', correctAnswer: '1/√(1-x²)', marks: 4, status: 'correct' },
+      { id: 23, text: 'Evaluate: ∫₀¹ x² dx', yourAnswer: '1/3', correctAnswer: '1/3', marks: 4, status: 'correct' },
+      { id: 24, text: 'Find the derivative of cos⁻¹(x)', yourAnswer: '-1/√(1-x²)', correctAnswer: '-1/√(1-x²)', marks: 4, status: 'correct' },
+      { id: 25, text: 'Evaluate: ∫₀π sin(x) dx', yourAnswer: '2', correctAnswer: '2', marks: 4, status: 'correct' }
+    ]
+  },
+  '3': {
+    examName: 'Geometry - Quiz 3',
+    date: 'September 1, 2026',
+    totalQuestions: 15,
+    correctAnswers: 7,
+    wrongAnswers: 5,
+    skipped: 3,
+    totalMarks: 50,
+    obtainedMarks: 22,
+    percentage: 44,
+    status: 'Fail',
+    timeTaken: '45m',
+    questions: [
+      { id: 1, text: 'Find the area of a circle with radius 7cm', yourAnswer: '154 cm²', correctAnswer: '154 cm²', marks: 4, status: 'correct' },
+      { id: 2, text: 'Find the perimeter of a square with side 5cm', yourAnswer: '20cm', correctAnswer: '20cm', marks: 3, status: 'correct' },
+      { id: 3, text: 'What is the Pythagorean theorem?', yourAnswer: 'a²+b²=c²', correctAnswer: 'a²+b²=c²', marks: 3, status: 'correct' },
+      { id: 4, text: 'Find the volume of a cube with side 3cm', yourAnswer: '27 cm³', correctAnswer: '27 cm³', marks: 4, status: 'correct' },
+      { id: 5, text: 'Find the area of a triangle with base 10 and height 5', yourAnswer: '25', correctAnswer: '25', marks: 3, status: 'correct' },
+      { id: 6, text: 'What is the sum of angles in a triangle?', yourAnswer: '180°', correctAnswer: '180°', marks: 3, status: 'correct' },
+      { id: 7, text: 'Find the circumference of a circle with diameter 10cm', yourAnswer: '31.4 cm', correctAnswer: '31.4 cm', marks: 4, status: 'correct' },
+      { id: 8, text: 'Find the area of a rectangle with length 8 and width 3', yourAnswer: '20', correctAnswer: '24', marks: 3, status: 'wrong' },
+      { id: 9, text: 'What is the formula for the area of a trapezoid?', yourAnswer: '½(a+b)h', correctAnswer: '½(a+b)h', marks: 3, status: 'correct' },
+      { id: 10, text: 'Find the volume of a cylinder with r=3, h=10', yourAnswer: '90π', correctAnswer: '90π', marks: 4, status: 'correct' },
+      { id: 11, text: 'Find the diagonal of a square with side 5', yourAnswer: '5√2', correctAnswer: '5√2', marks: 3, status: 'correct' },
+      { id: 12, text: 'What is the formula for the surface area of a sphere?', yourAnswer: '4πr²', correctAnswer: '4πr²', marks: 3, status: 'correct' },
+      { id: 13, text: 'Find the area of a parallelogram with base 6 and height 4', yourAnswer: '20', correctAnswer: '24', marks: 3, status: 'wrong' },
+      { id: 14, text: 'Find the volume of a cone with r=3, h=9', yourAnswer: '27π', correctAnswer: '27π', marks: 4, status: 'correct' },
+      { id: 15, text: 'What is the formula for the area of a regular hexagon?', yourAnswer: '(3√3/2)s²', correctAnswer: '(3√3/2)s²', marks: 4, status: 'correct' }
+    ]
+  }
+};
+
+const result = results[id] || results['1'];
+
+const circumference = 2 * Math.PI * 45;
+const dashOffset = circumference - (result.percentage / 100) * circumference;
+
+let percentageColor = 'text-danger-600';
+let strokeColor = 'stroke-danger-500';
+let bgColor = 'bg-danger-500';
+if (result.percentage >= 70) {
+  percentageColor = 'text-success-600';
+  strokeColor = 'stroke-success-500';
+  bgColor = 'bg-success-500';
+} else if (result.percentage >= 50) {
+  percentageColor = 'text-warning-600';
+  strokeColor = 'stroke-warning-500';
+  bgColor = 'bg-warning-500';
+}
+---
+
+<StudentLayout title={`Result - ${result.examName}`} studentName={studentName}>
+  <!-- Back Button -->
+  <div class="mb-6">
+    <a href="/dashboard/results" class="inline-flex items-center gap-2 text-slate-600 hover:text-primary-600 transition-colors font-medium">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Results
+    </a>
+  </div>
+
+  <!-- Exam Header -->
+  <div class="card p-6 lg:p-8 mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 text-white">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl lg:text-3xl font-bold mb-2">{result.examName}</h1>
+        <p class="text-white/80 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {result.date}
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm text-white font-semibold hover:bg-white/20 transition-colors border border-white/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          Print Result
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <!-- Main Result Card -->
+    <div class="lg:col-span-1">
+      <div class="card p-6 lg:sticky lg:top-24">
+        <!-- Circular Progress -->
+        <div class="flex justify-center mb-6">
+          <div class="relative w-36 h-36">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="8" />
+              <circle 
+                cx="50" cy="50" r="45" 
+                fill="none" 
+                class={strokeColor}
+                stroke-width="8" 
+                stroke-linecap="round"
+                stroke-dasharray={circumference}
+                stroke-dashoffset={dashOffset}
+                style="transition: stroke-dashoffset 1s ease-in-out"
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class={`text-3xl font-bold ${percentageColor}`}>{result.percentage}%</span>
+              <span class="text-xs text-slate-500 mt-1">Score</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="flex justify-center mb-6">
+          <span class={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold ${
+            result.status === 'Pass'
+              ? 'bg-success-500/10 text-success-600 border border-success-500/20'
+              : 'bg-danger-500/10 text-danger-600 border border-danger-500/20'
+          }`}>
+            {result.status === 'Pass' ? (
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+            {result.status === 'Pass' ? 'Congratulations! You Passed' : 'Sorry, You Failed'}
+          </span>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Total Questions</span>
+            </div>
+            <span class="font-bold text-slate-900">{result.totalQuestions}</span>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-success-500/5 rounded-xl border border-success-500/10">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-success-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-success-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Correct Answers</span>
+            </div>
+            <span class="font-bold text-success-600">{result.correctAnswers}</span>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-danger-500/5 rounded-xl border border-danger-500/10">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-danger-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Wrong Answers</span>
+            </div>
+            <span class="font-bold text-danger-600">{result.wrongAnswers}</span>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-warning-500/5 rounded-xl border border-warning-500/10">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-warning-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Skipped</span>
+            </div>
+            <span class="font-bold text-warning-600">{result.skipped}</span>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-primary-50 rounded-xl border border-primary-100">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Obtained / Total</span>
+            </div>
+            <span class="font-bold text-primary-600">{result.obtainedMarks} / {result.totalMarks}</span>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm text-slate-600">Time Taken</span>
+            </div>
+            <span class="font-bold text-slate-900">{result.timeTaken}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Breakdown -->
+    <div class="lg:col-span-2">
+      <div class="card">
+        <div class="p-5 border-b border-slate-100">
+          <h2 class="text-lg font-semibold text-slate-900">Question-by-Question Breakdown</h2>
+          <p class="text-sm text-slate-500 mt-1">Review your answers for each question</p>
+        </div>
+        <div class="p-5 space-y-4">
+          {result.questions.map((q: any) => (
+            <div class={`p-5 rounded-xl border-2 transition-all ${
+              q.status === 'correct' 
+                ? 'border-success-500/20 bg-success-500/5' 
+                : 'border-danger-500/20 bg-danger-500/5'
+            }`}>
+              <div class="flex items-start gap-4">
+                <div class={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  q.status === 'correct' 
+                    ? 'bg-success-500 text-white' 
+                    : 'bg-danger-500 text-white'
+                }`}>
+                  {q.status === 'correct' ? (
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-start justify-between gap-4 mb-3">
+                    <h3 class="font-medium text-slate-900">
+                      <span class="text-slate-400 mr-2">Q{q.id}.</span>
+                      {q.text}
+                    </h3>
+                    <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold flex-shrink-0 ${
+                      q.status === 'correct' 
+                        ? 'bg-success-500/10 text-success-600' 
+                        : 'bg-danger-500/10 text-danger-600'
+                    }`}>
+                      {q.marks} marks
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class={`p-3 rounded-lg ${
+                      q.status === 'correct' ? 'bg-success-500/10' : 'bg-danger-500/10'
+                    }`}>
+                      <p class="text-xs text-slate-500 mb-1">Your Answer</p>
+                      <p class={`font-semibold ${
+                        q.status === 'correct' ? 'text-success-700' : 'text-danger-700'
+                      }`}>{q.yourAnswer}</p>
+                    </div>
+                    <div class="p-3 rounded-lg bg-slate-100">
+                      <p class="text-xs text-slate-500 mb-1">Correct Answer</p>
+                      <p class="font-semibold text-slate-700">{q.correctAnswer}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</StudentLayout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const printBtn = document.querySelector('button:has(svg path[d*="M17 17h2"])');
+    if (printBtn) {
+      printBtn.addEventListener('click', () => {
+        window.print();
+      });
+    }
+  });
+</script>

@@ -1,0 +1,543 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+const exams = [
+  {
+    id: 1,
+    title: 'Chapter 1: Algebra Fundamentals',
+    grade: 9,
+    chapter: 'Chapter 1',
+    type: 'Chapter',
+    duration: 45,
+    totalMarks: 50,
+    questionsCount: 15,
+    status: 'Published',
+    passMarks: 25,
+  },
+  {
+    id: 2,
+    title: 'Model Test - Midterm Examination',
+    grade: 10,
+    chapter: 'Full Syllabus',
+    type: 'Model',
+    duration: 120,
+    totalMarks: 100,
+    questionsCount: 30,
+    status: 'Published',
+    passMarks: 40,
+  },
+  {
+    id: 3,
+    title: 'Chapter 3: Geometry & Trigonometry',
+    grade: 9,
+    chapter: 'Chapter 3',
+    type: 'Chapter',
+    duration: 40,
+    totalMarks: 40,
+    questionsCount: 12,
+    status: 'Draft',
+    passMarks: 20,
+  },
+  {
+    id: 4,
+    title: 'Weekly Series - Week 5',
+    grade: 8,
+    chapter: 'Chapter 5',
+    type: 'Series',
+    duration: 30,
+    totalMarks: 30,
+    questionsCount: 10,
+    status: 'Published',
+    passMarks: 15,
+  },
+  {
+    id: 5,
+    title: 'Pre-Board Model Test 2026',
+    grade: 10,
+    chapter: 'Full Syllabus',
+    type: 'Model',
+    duration: 150,
+    totalMarks: 100,
+    questionsCount: 35,
+    status: 'Draft',
+    passMarks: 40,
+  },
+  {
+    id: 6,
+    title: 'Chapter 2: Number Systems',
+    grade: 7,
+    chapter: 'Chapter 2',
+    type: 'Chapter',
+    duration: 35,
+    totalMarks: 35,
+    questionsCount: 10,
+    status: 'Archived',
+    passMarks: 18,
+  },
+];
+---
+
+<AdminLayout title="Exam Management">
+  <div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Exam Management</h1>
+        <p class="text-slate-500 mt-1">Manage exams for Math Solution & Exam Center Mymensingh</p>
+      </div>
+      <button
+        onclick="document.getElementById('exam-modal').classList.remove('hidden')"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 transition-all duration-200"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Create Exam
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-slate-900">{exams.length}</p>
+            <p class="text-xs text-slate-500">Total Exams</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-slate-900">{exams.filter(e => e.status === 'Published').length}</p>
+            <p class="text-xs text-slate-500">Published</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-slate-900">{exams.filter(e => e.status === 'Draft').length}</p>
+            <p class="text-xs text-slate-500">Drafts</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-slate-900">{exams.filter(e => e.status === 'Archived').length}</p>
+            <p class="text-xs text-slate-500">Archived</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-1 inline-flex gap-1">
+      <button onclick="filterExams('all')" data-filter="all" class="filter-tab px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-primary-600 text-white shadow-md">
+        All Exams
+      </button>
+      <button onclick="filterExams('Published')" data-filter="Published" class="filter-tab px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:bg-slate-100">
+        Published
+      </button>
+      <button onclick="filterExams('Draft')" data-filter="Draft" class="filter-tab px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:bg-slate-100">
+        Draft
+      </button>
+      <button onclick="filterExams('Archived')" data-filter="Archived" class="filter-tab px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:bg-slate-100">
+        Archived
+      </button>
+    </div>
+
+    <!-- Exams Table -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Exam Title</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Chapter</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Duration</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Marks</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Questions</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+              <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {exams.map((exam) => (
+              <tr class="hover:bg-slate-50/50 transition-colors duration-150" data-status={exam.status}>
+                <td class="px-6 py-4">
+                  <div class="font-semibold text-slate-900">{exam.title}</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 text-primary-700">
+                    Grade {exam.grade}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600">{exam.chapter}</td>
+                <td class="px-6 py-4">
+                  <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                    exam.type === 'Chapter' ? 'bg-blue-50 text-blue-700' :
+                    exam.type === 'Model' ? 'bg-purple-50 text-purple-700' :
+                    'bg-teal-50 text-teal-700'
+                  }`}>
+                    {exam.type}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600">{exam.duration} min</td>
+                <td class="px-6 py-4 text-sm font-medium text-slate-900">{exam.totalMarks}</td>
+                <td class="px-6 py-4 text-sm text-slate-600">{exam.questionsCount}</td>
+                <td class="px-6 py-4">
+                  <span class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                    exam.status === 'Published' ? 'bg-emerald-50 text-emerald-700' :
+                    exam.status === 'Draft' ? 'bg-amber-50 text-amber-700' :
+                    'bg-slate-100 text-slate-600'
+                  }`}>
+                    <span class={`w-1.5 h-1.5 rounded-full ${
+                      exam.status === 'Published' ? 'bg-emerald-500' :
+                      exam.status === 'Draft' ? 'bg-amber-500' :
+                      'bg-slate-400'
+                    }`}></span>
+                    {exam.status}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1">
+                    <button title="Edit" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-600 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button title="View Questions" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-600 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <button title="Duplicate" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-primary-600 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                    <button title="Delete" class="p-2 rounded-lg hover:bg-danger-50 text-slate-500 hover:text-danger-600 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100">
+        <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-{exams.length}</span> of <span class="font-semibold text-slate-700">{exams.length}</span> exams</p>
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-1.5 text-sm font-medium text-slate-400 bg-slate-100 rounded-lg cursor-not-allowed">Previous</button>
+          <button class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
+          <button class="px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Questions Section -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <button
+        onclick="document.getElementById('questions-section').classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')"
+        class="w-full flex items-center justify-between px-6 py-5 hover:bg-slate-50 transition-colors"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="text-left">
+            <h3 class="font-bold text-slate-900">Add Questions to Exam</h3>
+            <p class="text-sm text-slate-500">Create and manage questions for selected exam</p>
+          </div>
+        </div>
+        <svg class="chevron w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <div id="questions-section" class="hidden border-t border-slate-100 p-6">
+        <!-- Question Form -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Select Exam</label>
+              <select class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                <option>Chapter 1: Algebra Fundamentals</option>
+                <option>Model Test - Midterm Examination</option>
+                <option>Chapter 3: Geometry & Trigonometry</option>
+                <option>Weekly Series - Week 5</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Question Text</label>
+              <textarea
+                rows="3"
+                placeholder="Enter the question here..."
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none"
+              ></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Option A</label>
+                <input type="text" placeholder="Enter option A" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Option B</label>
+                <input type="text" placeholder="Enter option B" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Option C</label>
+                <input type="text" placeholder="Enter option C" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Option D</label>
+                <input type="text" placeholder="Enter option D" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Correct Answer</label>
+                <select class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                  <option>Option A</option>
+                  <option>Option B</option>
+                  <option>Option C</option>
+                  <option>Option D</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Marks</label>
+                <input type="number" value="1" min="1" max="10" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" />
+              </div>
+            </div>
+            <button class="w-full px-5 py-2.5 bg-gradient-to-r from-secondary-600 to-secondary-700 text-white font-semibold rounded-xl shadow-lg shadow-secondary-600/25 hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add Question
+            </button>
+          </div>
+
+          <!-- Added Questions List -->
+          <div>
+            <h4 class="text-sm font-semibold text-slate-700 mb-3">Added Questions (<span class="text-primary-600">3</span>)</h4>
+            <div class="space-y-3">
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-200 transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex-1">
+                    <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded">Q1</span>
+                    <p class="text-sm text-slate-800 mt-2 font-medium">If x + 5 = 12, what is the value of x?</p>
+                    <div class="flex items-center gap-4 mt-2">
+                      <span class="text-xs text-emerald-600 font-semibold">Answer: Option C</span>
+                      <span class="text-xs text-slate-500">Marks: 1</span>
+                    </div>
+                  </div>
+                  <button class="p-1.5 rounded-lg hover:bg-danger-50 text-slate-400 hover:text-danger-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-200 transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex-1">
+                    <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded">Q2</span>
+                    <p class="text-sm text-slate-800 mt-2 font-medium">Simplify: 3(2x - 4) + 6</p>
+                    <div class="flex items-center gap-4 mt-2">
+                      <span class="text-xs text-emerald-600 font-semibold">Answer: Option B</span>
+                      <span class="text-xs text-slate-500">Marks: 2</span>
+                    </div>
+                  </div>
+                  <button class="p-1.5 rounded-lg hover:bg-danger-50 text-slate-400 hover:text-danger-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-200 transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex-1">
+                    <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded">Q3</span>
+                    <p class="text-sm text-slate-800 mt-2 font-medium">Factorize: x² - 9</p>
+                    <div class="flex items-center gap-4 mt-2">
+                      <span class="text-xs text-emerald-600 font-semibold">Answer: Option A</span>
+                      <span class="text-xs text-slate-500">Marks: 2</span>
+                    </div>
+                  </div>
+                  <button class="p-1.5 rounded-lg hover:bg-danger-50 text-slate-400 hover:text-danger-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit Exam Modal -->
+  <div id="exam-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('exam-modal').classList.add('hidden')"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900">Create New Exam</h3>
+        <button onclick="document.getElementById('exam-modal').classList.add('hidden')" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Exam Title</label>
+          <input
+            type="text"
+            placeholder="e.g., Chapter 1: Algebra Fundamentals"
+            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Grade</label>
+            <select class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+              <option value="">Select Grade</option>
+              <option>Grade 5</option>
+              <option>Grade 6</option>
+              <option>Grade 7</option>
+              <option>Grade 8</option>
+              <option>Grade 9</option>
+              <option>Grade 10</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Chapter</label>
+            <input
+              type="text"
+              placeholder="e.g., Chapter 1"
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Exam Type</label>
+            <select class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+              <option value="">Select Type</option>
+              <option>Chapter</option>
+              <option>Model</option>
+              <option>Series</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Duration (minutes)</label>
+            <input
+              type="number"
+              placeholder="45"
+              min="10"
+              max="300"
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Total Marks</label>
+            <input
+              type="number"
+              placeholder="50"
+              min="1"
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pass Marks</label>
+            <input
+              type="number"
+              placeholder="25"
+              min="1"
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            />
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Publish Immediately</p>
+            <p class="text-xs text-slate-500 mt-0.5">Make this exam visible to students right away</p>
+          </div>
+          <button type="button" onclick="this.querySelector('.toggle-dot').classList.toggle('translate-x-5'); this.querySelector('.toggle-bg').classList.toggle('bg-primary-600'); this.querySelector('.toggle-bg').classList.toggle('bg-slate-300')" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-slate-300">
+            <span class="toggle-dot inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform translate-x-1"></span>
+          </button>
+        </div>
+        <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="document.getElementById('exam-modal').classList.add('hidden')" class="flex-1 px-5 py-2.5 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="flex-1 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-600/25 hover:shadow-xl transition-all duration-200">
+            Create Exam
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script is:inline>
+    function filterExams(status) {
+      const tabs = document.querySelectorAll('.filter-tab');
+      tabs.forEach((tab) => {
+        const tabStatus = tab.getAttribute('data-filter');
+        if (tabStatus === status) {
+          tab.classList.add('bg-primary-600', 'text-white', 'shadow-md');
+          tab.classList.remove('text-slate-600');
+        } else {
+          tab.classList.remove('bg-primary-600', 'text-white', 'shadow-md');
+          tab.classList.add('text-slate-600');
+        }
+      });
+
+      const rows = document.querySelectorAll('tbody tr');
+      rows.forEach((row) => {
+        const rowStatus = row.getAttribute('data-status');
+        if (status === 'all' || rowStatus === status) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</AdminLayout>

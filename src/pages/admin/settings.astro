@@ -1,0 +1,790 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+const settings = {
+  general: {
+    siteName: 'Math Solution & Exam Center',
+    siteDescription: 'Premier mathematics coaching and examination center in Mymensingh, dedicated to academic excellence and student success.',
+    logo: '/logo.png',
+    favicon: '/favicon.svg',
+    footerText: '© 2026 Math Solution & Exam Center Mymensingh. All rights reserved.',
+  },
+  academic: {
+    currentYear: '2026-2027',
+    currentSemester: '1st Semester',
+    grades: [5, 6, 7, 8, 9, 10],
+    selectedGrades: [6, 7, 8, 9, 10],
+    batches: [
+      { id: 'B001', name: 'Class 10 - Morning', grade: 10, students: 42, status: 'active' },
+      { id: 'B002', name: 'Class 9 - Morning', grade: 9, students: 38, status: 'active' },
+      { id: 'B003', name: 'Class 10 - Evening', grade: 10, students: 35, status: 'active' },
+      { id: 'B004', name: 'Class 8 - Foundation', grade: 8, students: 45, status: 'active' },
+      { id: 'B005', name: 'Class 10 - Board Prep', grade: 10, students: 30, status: 'upcoming' },
+    ],
+  },
+  contact: {
+    address: '42/A, College Road, Mymensingh-2200, Bangladesh',
+    phones: ['+880 1712-345678', '+880 1912-987654', '+880 9123-456789'],
+    email: 'info@mathacademy-mymensingh.edu.bd',
+    mapsEmbed: '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.85123456789!2d90.3745!3d24.7471!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sMymensingh!5e0!3m2!1sen!2sbd!4v1234567890" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>',
+  },
+  social: {
+    facebook: 'https://www.facebook.com/MathAcademyMymensingh',
+    messenger: 'https://m.me/MathAcademyMymensingh',
+    youtube: 'https://www.youtube.com/@MathAcademyMymensingh',
+  },
+  email: {
+    smtpHost: 'smtp.gmail.com',
+    smtpPort: '587',
+    smtpUsername: 'noreply@mathacademy-mymensingh.edu.bd',
+    smtpPassword: '••••••••',
+    fromEmail: 'noreply@mathacademy-mymensingh.edu.bd',
+    fromName: 'Math Academy Mymensingh',
+  },
+};
+
+const batchesByStatus = {
+  active: settings.academic.batches.filter(b => b.status === 'active'),
+  upcoming: settings.academic.batches.filter(b => b.status === 'upcoming'),
+  completed: settings.academic.batches.filter(b => b.status === 'completed'),
+};
+---
+
+<AdminLayout title="Website Settings">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Website Settings</h1>
+      <p class="text-slate-500 mt-1">Manage configuration for Math Solution & Exam Center Mymensingh</p>
+    </div>
+    <button
+      onclick="saveAllSettings()"
+      class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 transition-all duration-200"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      Save All Changes
+    </button>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="mb-6">
+    <div class="flex overflow-x-auto border-b border-slate-200 -mb-px">
+      <button onclick="switchTab('general')" id="tab-general" class="tab-btn flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 border-primary-600 text-primary-600 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        General
+      </button>
+      <button onclick="switchTab('academic')" id="tab-academic" class="tab-btn flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        Academic
+      </button>
+      <button onclick="switchTab('contact')" id="tab-contact" class="tab-btn flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+        Contact
+      </button>
+      <button onclick="switchTab('social')" id="tab-social" class="tab-btn flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+        Social Media
+      </button>
+      <button onclick="switchTab('email')" id="tab-email" class="tab-btn flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Email
+      </button>
+    </div>
+  </div>
+
+  <!-- General Settings -->
+  <div id="panel-general" class="settings-panel">
+    <div class="card p-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        General Settings
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Website Name -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Website Name</label>
+          <input
+            type="text"
+            value={settings.general.siteName}
+            class="input-field"
+            placeholder="Enter website name"
+          />
+          <p class="text-xs text-slate-400 mt-1">Displayed in the header and browser tab</p>
+        </div>
+
+        <!-- Footer Text -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Footer Text</label>
+          <input
+            type="text"
+            value={settings.general.footerText}
+            class="input-field"
+            placeholder="Enter footer text"
+          />
+          <p class="text-xs text-slate-400 mt-1">Shown at the bottom of every page</p>
+        </div>
+
+        <!-- Website Description -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Website Description</label>
+          <textarea
+            rows="3"
+            class="input-field"
+            placeholder="Brief description for SEO and meta tags"
+          >{settings.general.siteDescription}</textarea>
+          <p class="text-xs text-slate-400 mt-1">Used for meta description and SEO purposes</p>
+        </div>
+
+        <!-- Logo Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Website Logo</label>
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              M
+            </div>
+            <div class="flex-1">
+              <input type="file" id="logoUpload" accept="image/*" class="hidden" />
+              <button
+                type="button"
+                onclick="document.getElementById('logoUpload').click()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-primary-400 hover:text-primary-600 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="text-sm">Upload Logo</span>
+              </button>
+              <p class="text-xs text-slate-400 mt-1">Recommended: 200x60px, PNG or SVG</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Favicon Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Favicon</label>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+              <span class="text-primary-600 font-bold text-lg">M</span>
+            </div>
+            <div class="flex-1">
+              <input type="file" id="faviconUpload" accept="image/*" class="hidden" />
+              <button
+                type="button"
+                onclick="document.getElementById('faviconUpload').click()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-primary-400 hover:text-primary-600 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="text-sm">Upload Favicon</span>
+              </button>
+              <p class="text-xs text-slate-400 mt-1">Recommended: 32x32px, ICO or PNG</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Settings -->
+  <div id="panel-academic" class="settings-panel hidden">
+    <div class="card p-6 mb-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        Academic Settings
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Current Academic Year -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Current Academic Year</label>
+          <select class="input-field">
+            <option value="2026-2027" selected>{settings.academic.currentYear}</option>
+            <option value="2025-2026">2025-2026</option>
+            <option value="2027-2028">2027-2028</option>
+          </select>
+          <p class="text-xs text-slate-400 mt-1">Academic session for records and reports</p>
+        </div>
+
+        <!-- Current Semester -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Current Semester</label>
+          <select class="input-field">
+            <option value="1st Semester" selected>{settings.academic.currentSemester}</option>
+            <option value="2nd Semester">2nd Semester</option>
+            <option value="Summer">Summer</option>
+          </select>
+          <p class="text-xs text-slate-400 mt-1">Active semester for scheduling</p>
+        </div>
+      </div>
+
+      <!-- Grades Available -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-slate-700 mb-3">Grades Available</label>
+        <div class="flex flex-wrap gap-3">
+          {[5, 6, 7, 8, 9, 10].map((grade) => {
+            const isSelected = settings.academic.selectedGrades.includes(grade);
+            return (
+              <label class={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+                <input type="checkbox" checked={isSelected} class="hidden" />
+                <span class={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-primary-500 bg-primary-500' : 'border-slate-300'}`}>
+                  {isSelected && (
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </span>
+                <span class="text-sm font-semibold">Class {grade}</span>
+              </label>
+            );
+          })}
+        </div>
+        <p class="text-xs text-slate-400 mt-2">Select which grades are available at the center</p>
+      </div>
+    </div>
+
+    <!-- Batches Management -->
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Batches
+        </h3>
+        <button
+          onclick="openBatchModal()"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-secondary-600 text-white rounded-xl text-sm font-semibold hover:bg-secondary-700 transition-colors shadow-md shadow-secondary-600/25"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Batch
+        </button>
+      </div>
+
+      <!-- Active Batches -->
+      <div class="mb-6">
+        <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span>
+          Active Batches
+        </h4>
+        <div class="space-y-2">
+          {batchesByStatus.active.map((batch) => (
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
+                  {batch.id.slice(-2)}
+                </div>
+                <div>
+                  <p class="font-semibold text-slate-900">{batch.name}</p>
+                  <p class="text-xs text-slate-500">Class {batch.grade} · {batch.students} students</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700 mr-2">Active</span>
+                <button class="p-2 text-slate-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Upcoming Batches -->
+      <div>
+        <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+          Upcoming Batches
+        </h4>
+        <div class="space-y-2">
+          {batchesByStatus.upcoming.map((batch) => (
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center text-yellow-700 font-bold text-sm">
+                  {batch.id.slice(-2)}
+                </div>
+                <div>
+                  <p class="font-semibold text-slate-900">{batch.name}</p>
+                  <p class="text-xs text-slate-500">Class {batch.grade} · {batch.students} students enrolled</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-yellow-100 text-yellow-700 mr-2">Upcoming</span>
+                <button class="p-2 text-slate-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Settings -->
+  <div id="panel-contact" class="settings-panel hidden">
+    <div class="card p-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        </svg>
+        Contact Information
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Address -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Address</label>
+          <textarea
+            rows="2"
+            class="input-field"
+            placeholder="Enter full address"
+          >{settings.contact.address}</textarea>
+          <p class="text-xs text-slate-400 mt-1">Full physical address of the center</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
+          <input
+            type="email"
+            value={settings.contact.email}
+            class="input-field"
+            placeholder="contact@example.com"
+          />
+          <p class="text-xs text-slate-400 mt-1">Primary contact email</p>
+        </div>
+
+        <!-- Phone Numbers -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Phone Numbers</label>
+          <div class="space-y-2" id="phoneNumbers">
+            {settings.contact.phones.map((phone, index) => (
+              <div class="flex items-center gap-2">
+                <input
+                  type="tel"
+                  value={phone}
+                  class="input-field flex-1"
+                  placeholder="+880 XXXX-XXXXXX"
+                />
+                {index === settings.contact.phones.length - 1 && index < 3 && (
+                  <button
+                    type="button"
+                    onclick="addPhoneNumber()"
+                    class="p-2.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors border border-slate-200"
+                    title="Add phone number"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                )}
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onclick="removePhoneNumber(this)"
+                    class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200"
+                    title="Remove phone number"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Add up to 4 phone numbers</p>
+        </div>
+
+        <!-- Google Maps Embed -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Google Maps Embed Code</label>
+          <textarea
+            rows="3"
+            class="input-field font-mono text-xs"
+            placeholder="<iframe src='https://www.google.com/maps/embed?...' ></iframe>"
+          >{settings.contact.mapsEmbed}</textarea>
+          <p class="text-xs text-slate-400 mt-1">Paste the embed code from Google Maps</p>
+          <div class="mt-3 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 h-64 flex items-center justify-center">
+            <div class="text-center text-slate-400">
+              <svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <p class="text-sm font-medium">Map Preview</p>
+              <p class="text-xs">Paste embed code above to preview</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Settings -->
+  <div id="panel-social" class="settings-panel hidden">
+    <div class="card p-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+        Social Media Links
+      </h3>
+
+      <div class="space-y-6">
+        <!-- Facebook Page -->
+        <div class="p-5 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-[#1877F2]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">Facebook Page</h4>
+              <p class="text-xs text-slate-500">Connect your official Facebook page</p>
+            </div>
+          </div>
+          <input
+            type="url"
+            value={settings.social.facebook}
+            class="input-field"
+            placeholder="https://www.facebook.com/your-page"
+          />
+        </div>
+
+        <!-- Facebook Messenger -->
+        <div class="p-5 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-[#00B2FF]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#00B2FF]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.2 5.42 3.15 7.2V22l3.04-1.67c.85.23 1.75.37 2.81.37 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm1 12.5l-2.38-2.54L6 14.5l4.62-4.93 2.38 2.54 5.62-2.54-4.62 4.93z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">Facebook Messenger</h4>
+              <p class="text-xs text-slate-500">Direct messenger link for student support</p>
+            </div>
+          </div>
+          <input
+            type="url"
+            value={settings.social.messenger}
+            class="input-field"
+            placeholder="https://m.me/your-page-name"
+          />
+        </div>
+
+        <!-- YouTube -->
+        <div class="p-5 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-[#FF0000]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#FF0000]" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">YouTube Channel</h4>
+              <p class="text-xs text-slate-500">Link to educational video content</p>
+            </div>
+          </div>
+          <input
+            type="url"
+            value={settings.social.youtube}
+            class="input-field"
+            placeholder="https://www.youtube.com/@your-channel"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Settings -->
+  <div id="panel-email" class="settings-panel hidden">
+    <div class="card p-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Email (SMTP) Configuration
+      </h3>
+      <p class="text-slate-500 text-sm mb-6">Configure outgoing email server for notifications and communications</p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- SMTP Host -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">SMTP Host</label>
+          <input
+            type="text"
+            value={settings.email.smtpHost}
+            class="input-field"
+            placeholder="smtp.gmail.com"
+          />
+          <p class="text-xs text-slate-400 mt-1">e.g. smtp.gmail.com, smtp.office365.com</p>
+        </div>
+
+        <!-- SMTP Port -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">SMTP Port</label>
+          <input
+            type="text"
+            value={settings.email.smtpPort}
+            class="input-field"
+            placeholder="587"
+          />
+          <p class="text-xs text-slate-400 mt-1">Common: 587 (TLS) or 465 (SSL)</p>
+        </div>
+
+        <!-- SMTP Username -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">SMTP Username</label>
+          <input
+            type="text"
+            value={settings.email.smtpUsername}
+            class="input-field"
+            placeholder="your-email@gmail.com"
+          />
+          <p class="text-xs text-slate-400 mt-1">Login credential for SMTP server</p>
+        </div>
+
+        <!-- SMTP Password -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">SMTP Password</label>
+          <div class="relative">
+            <input
+              type="password"
+              value="password123"
+              class="input-field pr-10"
+              placeholder="••••••••"
+            />
+            <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg class="w-5 h-5 eye-closed hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            </button>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Stored securely, never exposed in frontend</p>
+        </div>
+
+        <!-- From Email -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">From Email</label>
+          <input
+            type="email"
+            value={settings.email.fromEmail}
+            class="input-field"
+            placeholder="noreply@yourdomain.com"
+          />
+          <p class="text-xs text-slate-400 mt-1">Sender email address</p>
+        </div>
+
+        <!-- From Name -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">From Name</label>
+          <input
+            type="text"
+            value={settings.email.fromName}
+            class="input-field"
+            placeholder="Your Organization Name"
+          />
+          <p class="text-xs text-slate-400 mt-1">Display name for outgoing emails</p>
+        </div>
+      </div>
+
+      <!-- Test Email Button -->
+      <div class="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-slate-700">Test Email Configuration</p>
+          <p class="text-xs text-slate-500">Send a test email to verify SMTP settings</p>
+        </div>
+        <button
+          onclick="sendTestEmail()"
+          class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+          Send Test Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Batch Modal -->
+  <div id="batchModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeBatchModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md mx-4">
+      <div class="card p-0 overflow-hidden animate-in">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <h3 class="text-lg font-bold text-slate-900">Add New Batch</h3>
+          <button onclick="closeBatchModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <form class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Batch Name</label>
+            <input type="text" class="input-field" placeholder="e.g. Class 10 - Evening" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Grade</label>
+              <select class="input-field">
+                <option value="">Select grade</option>
+                {[5, 6, 7, 8, 9, 10].map(g => (
+                  <option value={g}>Class {g}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
+              <select class="input-field">
+                <option value="active">Active</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" onclick="closeBatchModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-secondary-600 to-secondary-700 rounded-xl shadow-lg shadow-secondary-600/25 hover:shadow-xl transition-all duration-200">
+              Add Batch
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes animate-in {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    .animate-in {
+      animation: animate-in 0.2s ease-out;
+    }
+    .settings-panel {
+      transition: opacity 0.2s ease;
+    }
+  </style>
+
+  <script is:inline>
+    function switchTab(tabName) {
+      document.querySelectorAll('.settings-panel').forEach(panel => panel.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-primary-600', 'text-primary-600');
+        btn.classList.add('border-transparent', 'text-slate-500');
+      });
+
+      const panel = document.getElementById(`panel-${tabName}`);
+      const tab = document.getElementById(`tab-${tabName}`);
+      if (panel) panel.classList.remove('hidden');
+      if (tab) {
+        tab.classList.remove('border-transparent', 'text-slate-500');
+        tab.classList.add('border-primary-600', 'text-primary-600');
+      }
+    }
+
+    function openBatchModal() {
+      document.getElementById('batchModal')?.classList.remove('hidden');
+    }
+
+    function closeBatchModal() {
+      document.getElementById('batchModal')?.classList.add('hidden');
+    }
+
+    function addPhoneNumber() {
+      const container = document.getElementById('phoneNumbers');
+      if (!container) return;
+      const count = container.querySelectorAll('input[type="tel"]').length;
+      if (count >= 4) return;
+
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.innerHTML = `
+        <input type="tel" class="input-field flex-1" placeholder="+880 XXXX-XXXXXX" />
+        <button type="button" onclick="removePhoneNumber(this)" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200" title="Remove phone number">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      `;
+      container.appendChild(div);
+    }
+
+    function removePhoneNumber(btn) {
+      const container = document.getElementById('phoneNumbers');
+      if (!container) return;
+      const input = btn.closest('.flex')?.querySelector('input');
+      if (input) input.remove();
+      btn.closest('.flex')?.remove();
+    }
+
+    function togglePassword(btn) {
+      const input = btn.parentElement?.querySelector('input');
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+      if (!input) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeOpen?.classList.add('hidden');
+        eyeClosed?.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        eyeOpen?.classList.remove('hidden');
+        eyeClosed?.classList.add('hidden');
+      }
+    }
+
+    function sendTestEmail() {
+      alert('Test email sent successfully! Check your inbox.');
+    }
+
+    function saveAllSettings() {
+      alert('All settings saved successfully!');
+    }
+  </script>
+</AdminLayout>

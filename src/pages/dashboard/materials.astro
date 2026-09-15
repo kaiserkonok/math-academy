@@ -1,0 +1,347 @@
+---
+import StudentLayout from '../../layouts/StudentLayout.astro';
+
+const studentName = 'Rafiq Ahmed';
+
+const materials = [
+  {
+    title: 'Algebra - Linear Equations',
+    grade: 8,
+    chapter: 'Chapter 3',
+    type: 'Notes',
+    description: 'Complete notes covering linear equations, variables, and solving methods with practice examples.',
+    fileSize: '2.4 MB',
+  },
+  {
+    title: 'Geometry - Triangles MCQ',
+    grade: 7,
+    chapter: 'Chapter 5',
+    type: 'MCQ',
+    description: '50 multiple choice questions on triangle properties, congruence, and similarity.',
+    fileSize: '850 KB',
+  },
+  {
+    title: 'Number Theory PDF',
+    grade: 6,
+    chapter: 'Chapter 1',
+    type: 'PDF',
+    description: 'Comprehensive PDF covering prime numbers, factors, multiples, and divisibility rules.',
+    fileSize: '5.1 MB',
+  },
+  {
+    title: 'Algebra Model Questions',
+    grade: 8,
+    chapter: 'Chapter 3',
+    type: 'Model',
+    description: 'Model exam paper with 100 marks covering algebra fundamentals and advanced problems.',
+    fileSize: '1.2 MB',
+  },
+  {
+    title: 'Fractions & Decimals Notes',
+    grade: 5,
+    chapter: 'Chapter 2',
+    type: 'Notes',
+    description: 'Easy-to-understand notes on fractions, decimals, and their conversions with examples.',
+    fileSize: '1.8 MB',
+  },
+  {
+    title: 'Trigonometry MCQ Bank',
+    grade: 10,
+    chapter: 'Chapter 4',
+    type: 'MCQ',
+    description: '100 MCQs on trigonometric ratios, identities, and applications.',
+    fileSize: '1.1 MB',
+  },
+  {
+    title: 'Statistics & Probability PDF',
+    grade: 9,
+    chapter: 'Chapter 6',
+    type: 'PDF',
+    description: 'Detailed PDF on mean, median, mode, probability, and data representation.',
+    fileSize: '3.7 MB',
+  },
+  {
+    title: 'Geometry Model Exam',
+    grade: 7,
+    chapter: 'Chapter 5',
+    type: 'Model',
+    description: 'Full-length model exam on geometry topics including circles and angles.',
+    fileSize: '980 KB',
+  },
+  {
+    title: 'Arithmetic Operations Notes',
+    grade: 5,
+    chapter: 'Chapter 1',
+    type: 'Notes',
+    description: 'Foundation notes on addition, subtraction, multiplication, and division strategies.',
+    fileSize: '2.0 MB',
+  },
+  {
+    title: 'Quadratic Equations MCQ',
+    grade: 10,
+    chapter: 'Chapter 2',
+    type: 'MCQ',
+    description: 'Test your knowledge on quadratic equations, formulas, and graphical solutions.',
+    fileSize: '720 KB',
+  },
+  {
+    title: 'Mensuration PDF',
+    grade: 9,
+    chapter: 'Chapter 7',
+    type: 'PDF',
+    description: 'Complete PDF on area, volume, and surface area of 2D and 3D shapes.',
+    fileSize: '4.3 MB',
+  },
+  {
+    title: 'Pre-Algebra Model Questions',
+    grade: 6,
+    chapter: 'Chapter 3',
+    type: 'Model',
+    description: 'Practice model paper covering pre-algebra concepts and problem-solving techniques.',
+    fileSize: '1.5 MB',
+  },
+];
+
+const typeBadgeClasses: Record<string, string> = {
+  Notes: 'bg-blue-100 text-blue-700 border border-blue-200',
+  MCQ: 'bg-purple-100 text-purple-700 border border-purple-200',
+  PDF: 'bg-red-100 text-red-700 border border-red-200',
+  Model: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+};
+
+const typeIconColors: Record<string, string> = {
+  Notes: 'text-blue-500',
+  MCQ: 'text-purple-500',
+  PDF: 'text-red-500',
+  Model: 'text-emerald-500',
+};
+---
+
+<StudentLayout title="Study Materials" studentName={studentName}>
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 mb-1">Study Materials</h1>
+    <p class="text-slate-500 text-sm">Access and download your study materials, notes, and model questions.</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="card p-4 mb-6">
+    <div class="relative">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search materials by title, chapter, or description..."
+        class="input-field pl-12 pr-4 w-full"
+      />
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="flex flex-wrap items-center gap-4 mb-6">
+    <!-- Type Filter -->
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium text-slate-600 mr-1">Type:</span>
+      <button class="filter-tab active px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-primary-500 text-white shadow-sm" data-filter="type" data-value="All">
+        All
+      </button>
+      <button class="filter-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="type" data-value="Notes">
+        Notes
+      </button>
+      <button class="filter-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="type" data-value="MCQ">
+        MCQs
+      </button>
+      <button class="filter-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="type" data-value="PDF">
+        PDFs
+      </button>
+      <button class="filter-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="type" data-value="Model">
+        Model Questions
+      </button>
+    </div>
+
+    <!-- Grade Filter -->
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium text-slate-600 mr-1">Grade:</span>
+      <button class="grade-tab active px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-primary-500 text-white shadow-sm" data-grade="All">
+        All
+      </button>
+      {[5, 6, 7, 8, 9, 10].map((grade) => (
+        <button class="grade-tab px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-slate-100 text-slate-600 hover:bg-slate-200" data-grade={grade.toString()}>
+          {grade}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <!-- Materials Count -->
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm text-slate-500">
+      Showing <span id="materials-count" class="font-semibold text-slate-900">{materials.length}</span> materials
+    </p>
+  </div>
+
+  <!-- Materials Grid -->
+  <div id="materials-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    {materials.map((material, i) => (
+      <div
+        class="card group hover:-translate-y-1 transition-all duration-300"
+        data-type={material.type}
+        data-grade={material.grade}
+      >
+        <div class="p-5">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                material.type === 'Notes' ? 'bg-blue-50' :
+                material.type === 'MCQ' ? 'bg-purple-50' :
+                material.type === 'PDF' ? 'bg-red-50' : 'bg-emerald-50'
+              }`}>
+                {material.type === 'Notes' && (
+                  <svg class={`w-5 h-5 ${typeIconColors[material.type]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                )}
+                {material.type === 'MCQ' && (
+                  <svg class={`w-5 h-5 ${typeIconColors[material.type]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                )}
+                {material.type === 'PDF' && (
+                  <svg class={`w-5 h-5 ${typeIconColors[material.type]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                )}
+                {material.type === 'Model' && (
+                  <svg class={`w-5 h-5 ${typeIconColors[material.type]}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  </svg>
+                )}
+              </div>
+              <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${typeBadgeClasses[material.type]}`}>
+                {material.type}
+              </span>
+            </div>
+          </div>
+
+          <!-- Title & Meta -->
+          <h3 class="text-base font-semibold text-slate-900 mb-1 group-hover:text-primary-600 transition-colors">
+            {material.title}
+          </h3>
+          <div class="flex items-center gap-2 text-xs text-slate-500 mb-3">
+            <span class="flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Grade {material.grade}
+            </span>
+            <span class="text-slate-300">|</span>
+            <span>{material.chapter}</span>
+            <span class="text-slate-300">|</span>
+            <span>{material.fileSize}</span>
+          </div>
+
+          <!-- Description -->
+          <p class="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
+            {material.description}
+          </p>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <a href={`/materials/STU-${String(i + 1).padStart(2, '0')}.pdf`} download class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </a>
+            <a href={`/materials/STU-${String(i + 1).padStart(2, '0')}.pdf`} target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View
+            </a>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Empty State -->
+  <div id="empty-state" class="hidden text-center py-16">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+      <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-semibold text-slate-700 mb-1">No materials found</h3>
+    <p class="text-sm text-slate-500">Try adjusting your search or filter criteria.</p>
+  </div>
+</StudentLayout>
+
+<script is:inline>
+  const searchInput = document.getElementById('search-input');
+  const materialsGrid = document.getElementById('materials-grid');
+  const emptyState = document.getElementById('empty-state');
+  const countEl = document.getElementById('materials-count');
+
+  let activeType = 'All';
+  let activeGrade = 'All';
+
+  function filterMaterials() {
+    const search = searchInput?.value.toLowerCase() || '';
+    const cards = materialsGrid?.querySelectorAll('[data-type]');
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const type = card.dataset.type || '';
+      const grade = card.dataset.grade || '';
+      const text = card.textContent?.toLowerCase() || '';
+
+      const matchType = activeType === 'All' || type === activeType;
+      const matchGrade = activeGrade === 'All' || grade === activeGrade;
+      const matchSearch = !search || text.includes(search);
+
+      if (matchType && matchGrade && matchSearch) {
+        card.style.display = '';
+        visible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (countEl) countEl.textContent = String(visible);
+    if (emptyState) emptyState.classList.toggle('hidden', visible > 0);
+    if (materialsGrid) materialsGrid.classList.toggle('hidden', visible === 0);
+  }
+
+  document.querySelectorAll('.filter-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach((b) => {
+        b.classList.remove('active', 'bg-primary-500', 'text-white', 'shadow-sm');
+        b.classList.add('bg-slate-100', 'text-slate-600');
+      });
+      btn.classList.add('active', 'bg-primary-500', 'text-white', 'shadow-sm');
+      btn.classList.remove('bg-slate-100', 'text-slate-600');
+      activeType = btn.dataset.value || 'All';
+      filterMaterials();
+    });
+  });
+
+  document.querySelectorAll('.grade-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.grade-tab').forEach((b) => {
+        b.classList.remove('active', 'bg-primary-500', 'text-white', 'shadow-sm');
+        b.classList.add('bg-slate-100', 'text-slate-600');
+      });
+      btn.classList.add('active', 'bg-primary-500', 'text-white', 'shadow-sm');
+      btn.classList.remove('bg-slate-100', 'text-slate-600');
+      activeGrade = btn.dataset.grade || 'All';
+      filterMaterials();
+    });
+  });
+
+  searchInput?.addEventListener('input', filterMaterials);
+</script>

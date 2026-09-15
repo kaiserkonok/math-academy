@@ -1,0 +1,325 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+
+const notices = [
+  {
+    id: 1,
+    title: "SSC Examination Schedule 2026 Released",
+    date: "2026-09-12",
+    category: "exams",
+    important: true,
+    content: "The SSC examination schedule for 2026 has been officially released. All students must complete their registration by October 15, 2026. Contact the front desk for details regarding exam center assignments and preparation materials.",
+    pdfUrl: "/notices/ssc-schedule-2026.pdf"
+  },
+  {
+    id: 2,
+    title: "Scholarship Test for Meritorious Students",
+    date: "2026-09-10",
+    category: "exams",
+    important: true,
+    content: "Math Academy is offering full and partial scholarships based on a competitive entrance test. The test will be held on September 28, 2026. Students scoring above 80% will receive a full scholarship for the upcoming academic session.",
+    pdfUrl: "/notices/scholarship-test.pdf"
+  },
+  {
+    id: 3,
+    title: "Monthly Test Results - September 2026",
+    date: "2026-09-08",
+    category: "results",
+    important: false,
+    content: "Results for the September monthly test are now available. Students can check their scores at the reception desk or through the student portal. Top performers will be awarded certificates and prizes in the upcoming assembly.",
+    pdfUrl: null
+  },
+  {
+    id: 4,
+    title: "Holiday Notice: Eid-ul-Milad Vacation",
+    date: "2026-09-05",
+    category: "general",
+    important: false,
+    content: "Math Academy will remain closed from September 15 to September 17 on account of Eid-ul-Milad. Regular classes will resume on September 18. We wish everyone a blessed celebration.",
+    pdfUrl: null
+  },
+  {
+    id: 5,
+    title: "New Batch Starting for Grade 9-10 Mathematics",
+    date: "2026-09-02",
+    category: "general",
+    important: false,
+    content: "A new intensive batch for Grade 9-10 mathematics is starting on September 20, 2026. Limited seats available. Early registration is encouraged. This batch focuses on HSC preparation and advanced problem-solving techniques.",
+    pdfUrl: "/notices/new-batch-sept-2026.pdf"
+  },
+  {
+    id: 6,
+    title: "Annual Math Olympiad 2026",
+    date: "2026-08-28",
+    category: "exams",
+    important: true,
+    content: "The 8th Annual Math Olympiad will be held on October 5, 2026. Students from all batches are encouraged to participate. Winners will receive trophies, certificates, and cash prizes. Registration deadline is September 25, 2026.",
+    pdfUrl: "/notices/math-olympiad-2026.pdf"
+  },
+  {
+    id: 7,
+    title: "Parent-Teacher Meeting Scheduled",
+    date: "2026-08-25",
+    category: "general",
+    important: false,
+    content: "A parent-teacher meeting is scheduled for September 20, 2026 from 10:00 AM to 2:00 PM. Parents are requested to attend and discuss their child's academic progress. Appointment slots can be booked at the front desk.",
+    pdfUrl: null
+  },
+  {
+    id: 8,
+    title: "Mid-Term Exam Results Published",
+    date: "2026-08-20",
+    category: "results",
+    important: false,
+    content: "Mid-term examination results for all batches have been published. Students can access their detailed scorecards through the student portal. Detailed performance analysis reports will be distributed during class.",
+    pdfUrl: "/notices/midterm-results-2026.pdf"
+  },
+  {
+    id: 9,
+    title: "Updated Fee Structure for 2026-27 Session",
+    date: "2026-08-15",
+    category: "general",
+    important: true,
+    content: "The fee structure for the 2026-27 academic session has been updated. Early bird discounts are available for registrations before October 1. Scholarship holders will receive a 50% concession on tuition fees.",
+    pdfUrl: "/notices/fee-structure-2026-27.pdf"
+  },
+  {
+    id: 10,
+    title: "HSC Preparation Workshop Series",
+    date: "2026-08-10",
+    category: "general",
+    important: false,
+    content: "A series of free workshops on HSC preparation strategies will be held every Saturday in October. Topics include time management, exam techniques, and high-scoring question patterns. Open to all Grade 11-12 students.",
+    pdfUrl: null
+  }
+];
+
+const categories = [
+  { value: "all", label: "All Notices" },
+  { value: "important", label: "Important" },
+  { value: "exams", label: "Exams" },
+  { value: "results", label: "Results" },
+  { value: "general", label: "General" }
+];
+
+const importantNotices = notices.filter(n => n.important);
+const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<PublicLayout title="Notices & Announcements" description="Stay updated with the latest notices, exam schedules, and announcements from Math Solution & Exam Center Mymensingh">
+
+  <!-- Page Header -->
+  <section class="relative overflow-hidden gradient-bg py-20 lg:py-28">
+    <div class="absolute inset-0">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="absolute inset-0 opacity-[0.03]">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="notice-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#notice-grid)"/>
+      </svg>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <span class="inline-block bg-white/10 backdrop-blur-sm text-white/90 text-sm font-semibold px-4 py-2 rounded-full mb-6">Stay Informed</span>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6">Notices & Announcements</h1>
+      <p class="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+        Important updates, exam schedules, results, and announcements from Math Solution & Exam Center Mymensingh
+      </p>
+    </div>
+  </section>
+
+  <!-- Important Notices -->
+  <section class="section-padding bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">Urgent</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Important <span class="gradient-text">Notices</span>
+        </h2>
+        <p class="text-slate-500 mt-4 text-lg">Please read these notices carefully — action may be required</p>
+      </div>
+      <div class="grid gap-4">
+        {importantNotices.map((notice) => (
+          <div class="relative overflow-hidden rounded-xl border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-orange-50 p-6 sm:p-8 hover:shadow-lg transition-all duration-300">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full -translate-y-16 translate-x-16 blur-2xl"></div>
+            <div class="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                    IMPORTANT
+                  </span>
+                  <span class="inline-block bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full capitalize">{notice.category}</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">{notice.title}</h3>
+                <p class="text-slate-600 leading-relaxed">{notice.content}</p>
+              </div>
+              <div class="flex flex-col items-start sm:items-end gap-2 shrink-0">
+                <span class="text-sm text-slate-500 flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {formatDate(notice.date)}
+                </span>
+                {notice.pdfUrl && (
+                  <a href={notice.pdfUrl} class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download PDF
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- All Notices with Filter -->
+  <section class="section-padding bg-slate-50">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">Archive</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          All <span class="gradient-text">Notices</span>
+        </h2>
+        <p class="text-slate-500 mt-4 text-lg">Browse through all our announcements and updates</p>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="flex flex-wrap justify-center gap-3 mb-10" id="filter-buttons">
+        {categories.map((cat) => (
+          <button
+            data-filter={cat.value}
+            class={`filter-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${cat.value === 'all' ? 'gradient-bg text-white shadow-lg shadow-primary-500/30' : 'bg-white text-slate-600 border border-slate-200 hover:border-primary-300 hover:text-primary-600 hover:shadow-md'}`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Notices List -->
+      <div class="grid gap-4" id="notices-list">
+        {notices.map((notice) => (
+          <div
+            data-category={notice.category}
+            data-important={notice.important}
+            class={`notice-item card p-6 sm:p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${notice.important ? 'border-l-4 border-red-400 bg-gradient-to-r from-red-50/50 to-white' : 'border-l-4 border-transparent'}`}
+          >
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  {notice.important && (
+                    <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      Important
+                    </span>
+                  )}
+                  <span class="inline-block bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full capitalize">{notice.category}</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">{notice.title}</h3>
+                <p class="text-slate-600 leading-relaxed text-sm sm:text-base">{notice.content}</p>
+              </div>
+              <div class="flex flex-col items-start sm:items-end gap-2 shrink-0">
+                <span class="text-sm text-slate-500 flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {formatDate(notice.date)}
+                </span>
+                {notice.pdfUrl && (
+                  <a href={notice.pdfUrl} class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    PDF
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- No Results Message -->
+      <div id="no-results" class="hidden text-center py-16">
+        <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-slate-500 text-lg font-semibold">No notices found for this category</p>
+        <p class="text-slate-400 mt-1">Try selecting a different filter</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-padding gradient-bg relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6">Never Miss an Update</h2>
+      <p class="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+        Stay connected with Math Academy. Follow us on social media or contact us for the latest information.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/contact" class="inline-flex items-center gap-2 bg-white text-primary-700 px-10 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Contact Us
+        </a>
+        <a href="/admission" class="inline-flex items-center gap-2 border-2 border-white/30 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Enroll Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+</PublicLayout>
+
+<script is:inline>
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const noticeItems = document.querySelectorAll('.notice-item');
+  const noResults = document.getElementById('no-results');
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => {
+        b.classList.remove('gradient-bg', 'text-white', 'shadow-lg', 'shadow-primary-500/30');
+        b.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+      });
+      btn.classList.add('gradient-bg', 'text-white', 'shadow-lg', 'shadow-primary-500/30');
+      btn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+
+      const filter = btn.getAttribute('data-filter');
+      let visibleCount = 0;
+
+      noticeItems.forEach(item => {
+        const category = item.getAttribute('data-category');
+        const important = item.getAttribute('data-important') === 'true';
+        let show = false;
+
+        if (filter === 'all') show = true;
+        else if (filter === 'important') show = important;
+        else show = category === filter;
+
+        (item).style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+
+      noResults.classList.toggle('hidden', visibleCount > 0);
+    });
+  });
+</script>

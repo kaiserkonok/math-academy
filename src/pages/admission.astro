@@ -1,0 +1,207 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+---
+
+<PublicLayout title="Online Admission" description="Apply online for admission to Math Solution & Exam Center Mymensingh - Start your journey to mathematical excellence.">
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden gradient-bg min-h-[40vh] flex items-center">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <span class="inline-block text-white/80 font-semibold text-sm uppercase tracking-wider mb-3">Start Your Journey</span>
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">Online Admission</h1>
+      <p class="text-lg text-white/80 max-w-2xl mx-auto">
+        Join Math Solution & Exam Center Mymensingh and unlock your potential in mathematics.
+      </p>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+  </section>
+
+  <!-- Admission Form -->
+  <section class="section-padding -mt-10 relative z-10">
+    <div class="max-w-3xl mx-auto">
+      <div class="card p-8 sm:p-10">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">Fill Out Your Application</h2>
+          <p class="text-slate-500">Complete the form below and we will contact you shortly.</p>
+        </div>
+
+        <form id="admission-form" class="space-y-5">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="student-name" class="block text-sm font-semibold text-slate-700 mb-1.5">Student Name</label>
+              <input type="text" id="student-name" name="student-name" required placeholder="Enter student's full name" class="input-field" />
+            </div>
+            <div>
+              <label for="class" class="block text-sm font-semibold text-slate-700 mb-1.5">Class / Grade</label>
+              <select id="class" name="class" required class="input-field">
+                <option value="" disabled selected>Select class</option>
+                <option value="5">Class 5</option>
+                <option value="6">Class 6</option>
+                <option value="7">Class 7</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="batch" class="block text-sm font-semibold text-slate-700 mb-1.5">Batch</label>
+              <select id="batch" name="batch" required class="input-field">
+                <option value="" disabled selected>Select batch</option>
+                <option value="morning">Morning</option>
+                <option value="afternoon">Afternoon</option>
+                <option value="evening">Evening</option>
+              </select>
+            </div>
+            <div>
+              <label for="mobile" class="block text-sm font-semibold text-slate-700 mb-1.5">Mobile Number</label>
+              <input type="tel" id="mobile" name="mobile" required placeholder="+880 1XXX-XXXXXX" class="input-field" />
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="parent-name" class="block text-sm font-semibold text-slate-700 mb-1.5">Parent / Guardian Name</label>
+              <input type="text" id="parent-name" name="parent-name" required placeholder="Enter parent's full name" class="input-field" />
+            </div>
+            <div>
+              <label for="parent-phone" class="block text-sm font-semibold text-slate-700 mb-1.5">Parent / Guardian Phone</label>
+              <input type="tel" id="parent-phone" name="parent-phone" required placeholder="+880 1XXX-XXXXXX" class="input-field" />
+            </div>
+          </div>
+
+          <div>
+            <label for="address" class="block text-sm font-semibold text-slate-700 mb-1.5">Address</label>
+            <textarea id="address" name="address" rows="3" required placeholder="Enter your full address" class="input-field resize-none"></textarea>
+          </div>
+
+          <div>
+            <label for="referral" class="block text-sm font-semibold text-slate-700 mb-1.5">How did you hear about us?</label>
+            <select id="referral" name="referral" class="input-field">
+              <option value="" disabled selected>Select an option</option>
+              <option value="facebook">Facebook</option>
+              <option value="friends">Friends / Family</option>
+              <option value="newspaper">Newspaper</option>
+              <option value="school">School Teacher</option>
+              <option value="flyer">Flyer / Poster</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div id="admission-error" class="hidden px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700"></div>
+          <div id="admission-success" class="hidden px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-sm text-green-700"></div>
+
+          <button type="submit" id="admission-btn" class="btn-primary w-full flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Submit Application</span>
+          </button>
+          <!-- Honeypot anti-spam field: invisible to humans, bots fill it in -->
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" class="hidden" />
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Cards -->
+  <section class="section-padding bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="inline-block text-primary-600 font-semibold text-sm uppercase tracking-wider mb-3">How It Works</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">Admission Information</h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card p-8 text-center group hover:-translate-y-1">
+          <div class="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform shadow-lg shadow-primary-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Admission Process</h3>
+          <p class="text-slate-500 leading-relaxed">Fill out the online form, receive a confirmation call, and visit our center to complete enrollment with required documents.</p>
+        </div>
+
+        <div class="card p-8 text-center group hover:-translate-y-1">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary-500 to-secondary-700 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform shadow-lg shadow-secondary-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Requirements</h3>
+          <p class="text-slate-500 leading-relaxed">Bring your previous report card, national ID or birth certificate, two passport-size photos, and admission fee.</p>
+        </div>
+
+        <div class="card p-8 text-center group hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-500 to-cyan-600 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform shadow-lg shadow-accent-500/25">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Contact for Help</h3>
+          <p class="text-slate-500 leading-relaxed">Need assistance? Call us at +880 1XXX-XXXXXX or visit our center at Station Road, Mymensingh during office hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    const admissionForm = document.getElementById('admission-form');
+    const admissionError = document.getElementById('admission-error');
+    const admissionSuccess = document.getElementById('admission-success');
+    const admissionBtn = document.getElementById('admission-btn');
+    const admissionBtnHtml = admissionBtn.innerHTML;
+
+    admissionForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      admissionError.classList.add('hidden');
+      admissionSuccess.classList.add('hidden');
+
+      admissionBtn.disabled = true;
+      admissionBtn.textContent = 'Submitting...';
+
+      const payload = {
+        studentName: document.getElementById('student-name').value.trim(),
+        grade: parseInt(document.getElementById('class').value, 10),
+        batch: document.getElementById('batch').value,
+        phone: document.getElementById('mobile').value.trim(),
+        parentName: document.getElementById('parent-name').value.trim(),
+        parentPhone: document.getElementById('parent-phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        website: document.getElementById('website').value,
+      };
+
+      try {
+        const res = await fetch('/api/admissions/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const out = await res.json();
+        if (!res.ok) throw new Error(out.error || 'Submission failed. Please try again.');
+
+        admissionSuccess.textContent = 'Application submitted successfully! We will contact you shortly.';
+        admissionSuccess.classList.remove('hidden');
+        admissionForm.reset();
+        admissionBtn.disabled = false;
+        admissionBtn.innerHTML = admissionBtnHtml;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        admissionError.textContent = err.message || 'Submission failed. Please try again.';
+        admissionError.classList.remove('hidden');
+        admissionBtn.disabled = false;
+        admissionBtn.innerHTML = admissionBtnHtml;
+      }
+    });
+  </script>
+
+</PublicLayout>

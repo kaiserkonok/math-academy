@@ -1,0 +1,235 @@
+---
+import StudentLayout from '../../layouts/StudentLayout.astro';
+
+const studentName = 'Rafiq Ahmed';
+const today = new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+const motivationalQuote = "Success is the sum of small efforts, repeated day in and day out.";
+
+const stats = [
+  { label: 'Exams Taken', value: '12', icon: 'clipboard', color: 'primary' },
+  { label: 'Average Score', value: '78%', icon: 'chart', color: 'success' },
+  { label: 'Upcoming Exams', value: '3', icon: 'calendar', color: 'warning' },
+  { label: 'Study Hours', value: '48h', icon: 'clock', color: 'secondary' },
+];
+
+const recentExams = [
+  { name: 'Algebra - Chapter 5 Test', date: 'Sep 10, 2026', score: '85/100', status: 'Pass' },
+  { name: 'Calculus - Midterm', date: 'Sep 5, 2026', score: '72/100', status: 'Pass' },
+  { name: 'Geometry - Quiz 3', date: 'Sep 1, 2026', score: '45/100', status: 'Fail' },
+  { name: 'Trigonometry - Chapter 2', date: 'Aug 28, 2026', score: '91/100', status: 'Pass' },
+  { name: 'Statistics - Unit Test', date: 'Aug 22, 2026', score: '78/100', status: 'Pass' },
+];
+
+const upcomingExams = [
+  { name: 'Calculus - Final Exam', date: 'Sep 20, 2026', time: '9:00 AM', duration: '3 hours' },
+  { name: 'Algebra - Chapter 6 Test', date: 'Sep 25, 2026', time: '2:00 PM', duration: '1.5 hours' },
+  { name: 'Geometry - Midterm', date: 'Sep 30, 2026', time: '10:00 AM', duration: '2 hours' },
+];
+
+const notices = [
+  { title: 'Holiday Notice - September 16', date: 'Sep 12, 2026', important: true },
+  { title: 'New Study Materials Uploaded', date: 'Sep 11, 2026', important: false },
+  { title: 'Exam Schedule Updated', date: 'Sep 10, 2026', important: true },
+];
+---
+
+<StudentLayout title="Dashboard" studentName={studentName}>
+  <!-- Welcome Banner -->
+  <div class="card p-6 lg:p-8 mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 text-white border-0">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl lg:text-3xl font-bold mb-1">Welcome back, {studentName}!</h1>
+        <p class="text-white/80">{today}</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3 max-w-md">
+        <p class="text-sm text-white/70 italic">"{motivationalQuote}"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    {stats.map((stat) => (
+      <div class="card p-5">
+        <div class="flex items-center gap-4">
+          <div class={`w-12 h-12 rounded-xl flex items-center justify-center ${
+            stat.color === 'primary' ? 'bg-primary-100 text-primary-600' :
+            stat.color === 'success' ? 'bg-success-500/10 text-success-500' :
+            stat.color === 'warning' ? 'bg-warning-500/10 text-warning-500' :
+            'bg-secondary-100 text-secondary-600'
+          }`}>
+            {stat.icon === 'clipboard' && (
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            )}
+            {stat.icon === 'chart' && (
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            )}
+            {stat.icon === 'calendar' && (
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            )}
+            {stat.icon === 'clock' && (
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-slate-900">{stat.value}</p>
+            <p class="text-sm text-slate-500">{stat.label}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <!-- Recent Exams -->
+    <div class="lg:col-span-2">
+      <div class="card">
+        <div class="p-5 border-b border-slate-100">
+          <h2 class="text-lg font-semibold text-slate-900">Recent Exams</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-slate-100">
+                <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Exam</th>
+                <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Date</th>
+                <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Score</th>
+                <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentExams.map((exam) => (
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.name}</td>
+                  <td class="px-5 py-4 text-sm text-slate-500">{exam.date}</td>
+                  <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.score}</td>
+                  <td class="px-5 py-4">
+                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      exam.status === 'Pass'
+                        ? 'bg-success-500/10 text-success-600'
+                        : 'bg-danger-500/10 text-danger-600'
+                    }`}>
+                      {exam.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mt-6">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <a href="/dashboard/exams" class="card p-5 text-center hover:-translate-y-1 transition-all duration-200">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-slate-700">Take Exam</span>
+          </a>
+          <a href="/dashboard/results" class="card p-5 text-center hover:-translate-y-1 transition-all duration-200">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-success-500/10 text-success-500 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-slate-700">View Results</span>
+          </a>
+          <a href="/dashboard/routine" class="card p-5 text-center hover:-translate-y-1 transition-all duration-200">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-warning-500/10 text-warning-500 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-slate-700">View Routine</span>
+          </a>
+          <a href="/dashboard/materials" class="card p-5 text-center hover:-translate-y-1 transition-all duration-200">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-secondary-100 text-secondary-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-slate-700">Download Materials</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="space-y-6">
+      <!-- Upcoming Exams -->
+      <div class="card">
+        <div class="p-5 border-b border-slate-100">
+          <h2 class="text-lg font-semibold text-slate-900">Upcoming Exams</h2>
+        </div>
+        <div class="p-5 space-y-4">
+          {upcomingExams.map((exam) => (
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <h3 class="font-semibold text-slate-900 text-sm mb-2">{exam.name}</h3>
+              <div class="flex items-center gap-4 text-xs text-slate-500">
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {exam.date}
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {exam.time}
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {exam.duration}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Recent Notices -->
+      <div class="card">
+        <div class="p-5 border-b border-slate-100">
+          <h2 class="text-lg font-semibold text-slate-900">Recent Notices</h2>
+        </div>
+        <div class="p-5 space-y-3">
+          {notices.map((notice) => (
+            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+              <div class={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
+                notice.important ? 'bg-danger-500' : 'bg-slate-300'
+              }`}></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-sm font-medium text-slate-900 truncate">{notice.title}</h3>
+                  {notice.important && (
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-danger-500/10 text-danger-600">
+                      IMPORTANT
+                    </span>
+                  )}
+                </div>
+                <p class="text-xs text-slate-500">{notice.date}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</StudentLayout>
