@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createClient, cookieSetCookieHeaders } from '../../../lib/supabase-server';
+import { checkRateLimit } from '../../../lib/rate-limit';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   let body: { email?: string; password?: string };
@@ -15,6 +16,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return Response.json({ error: 'Email and password are required.' }, { status: 400 });
   }
 
+  if (!checkRateLimit(email, 5, 60000)) {
+    return Response.json({ error: 'Too many attempts. Please try again later.' }, { status: 429 });
+  }
+
   if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
     console.error('[login] Missing Supabase env vars — sign-in impossible.');
     return Response.json(
@@ -27,7 +32,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const { supabase, pendingSet } = createClient(request, cookies);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      return Response.json({ error: error.message }, { status: 401 });
+      console.error('[login] auth error:', error.message);
+      return Response.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
     const { data: profile } = await supabase

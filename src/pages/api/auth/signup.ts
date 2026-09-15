@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createClient, cookieSetCookieHeaders } from '../../../lib/supabase-server';
+import { checkRateLimit } from '../../../lib/rate-limit';
 
 interface SignupBody {
   fullName?: string;
@@ -32,6 +33,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
   if (password.length < 6) {
     return Response.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
+  }
+  if (fullName.length > 100 || email.length > 254 || phone.length > 20 || parentName.length > 100 || password.length > 128) {
+    return Response.json({ error: 'Input too long.' }, { status: 400 });
+  }
+
+  if (!checkRateLimit(email, 3, 300000)) {
+    return Response.json({ error: 'Too many attempts. Please try again later.' }, { status: 429 });
   }
 
   if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
