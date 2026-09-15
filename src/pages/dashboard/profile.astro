@@ -2,7 +2,7 @@
 import StudentLayout from '../../layouts/StudentLayout.astro';
 import { createClient } from '../../lib/supabase-server';
 
-const supabase = createClient(Astro.cookies);
+const supabase = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
 const { data: profile } = await supabase.from('profiles').select('*').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';

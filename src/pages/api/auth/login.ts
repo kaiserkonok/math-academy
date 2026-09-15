@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   try {
-    const supabase = createClient(cookies);
+    const supabase = createClient(request, cookies);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       return Response.json({ error: error.message }, { status: 401 });

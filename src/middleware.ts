@@ -8,7 +8,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/admin');
   if (!isProtected) return next();
 
-  const supabase = createClient(context.cookies);
+  const supabase = createClient(context.request, context.cookies);
   const {
     data: { user },
   } = await supabase.auth.getUser();
