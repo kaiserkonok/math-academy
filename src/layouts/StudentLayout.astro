@@ -33,6 +33,7 @@ const currentPath = Astro.url.pathname;
   <title>{title} | Math Academy</title>
 </head>
 <body class="min-h-screen bg-slate-50">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-primary-600 focus:text-white focus:rounded-lg">Skip to main content</a>
   <!-- Mobile Header -->
   <header class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
     <div class="flex items-center justify-between h-16 px-4">
@@ -169,10 +170,16 @@ const currentPath = Astro.url.pathname;
     </header>
 
     <!-- Page Content -->
-    <main class="p-4 lg:p-6 pt-20 lg:pt-6">
+    <main id="main-content" class="p-4 lg:p-6 pt-20 lg:pt-6">
       <slot />
     </main>
   </div>
+
+  <button id="back-to-top" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-700 transition-all duration-300 opacity-0 pointer-events-none flex items-center justify-center" aria-label="Back to top">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
 
   <script is:inline>
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -197,6 +204,18 @@ const currentPath = Astro.url.pathname;
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeSidebar();
     });
+
+    const backToTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTop?.classList.remove('opacity-0', 'pointer-events-none');
+        backToTop?.classList.add('opacity-100');
+      } else {
+        backToTop?.classList.add('opacity-0', 'pointer-events-none');
+        backToTop?.classList.remove('opacity-100');
+      }
+    });
+    backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   </script>
 </body>
 </html>
