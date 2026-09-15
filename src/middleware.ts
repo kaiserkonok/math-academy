@@ -1,8 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 import { createClient } from './lib/supabase-server';
 
-// Protects /dashboard/* (any logged-in user) and /admin/* (admins only).
-// Unauthenticated visitors are sent to /login; non-admins to /dashboard/.
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/admin');
@@ -25,5 +23,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect('/dashboard/');
     }
   }
-  return next();
+
+  const response = await next();
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  response.headers.set('Pragma', 'no-cache');
+  return response;
 });
