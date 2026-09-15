@@ -15,9 +15,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return Response.json({ error: 'Email and password are required.' }, { status: 400 });
   }
 
-  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) {
+  if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
     console.error('[login] Missing Supabase env vars — sign-in impossible.');
     return Response.json(
       { error: 'Online login is not available right now. Please contact the center office.' },
@@ -32,24 +30,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return Response.json({ error: error.message }, { status: 401 });
     }
 
-    const userId = data.user.id;
-    const accessToken = data.session?.access_token;
-
-    let profile: { role: string } | null = null;
-
-    if (accessToken) {
-      const resp = await fetch(
-        `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=role`,
-        {
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const rows = await resp.json();
-      profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .single();
 
     if (!profile) {
       await supabase.auth.signOut();

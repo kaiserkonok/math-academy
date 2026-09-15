@@ -34,9 +34,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return Response.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
   }
 
-  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) {
+  if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
     console.error('[signup] Missing Supabase env vars — account cannot be created.');
     return Response.json(
       { error: 'Online registration is not available right now. Please contact the center office.' },
@@ -67,18 +65,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     if (data.session) {
-      const accessToken = data.session.access_token;
-      const resp = await fetch(
-        `${supabaseUrl}/rest/v1/profiles?id=eq.${data.user.id}&select=student_id`,
-        {
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const rows = await resp.json();
-      const profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('student_id')
+        .eq('id', data.user.id)
+        .single();
       return Response.json({ redirect: '/dashboard/', studentId: profile?.student_id ?? null });
     }
 
