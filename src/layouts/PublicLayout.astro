@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { createClient } from '../lib/supabase-server';
 
 interface Props {
   title: string;
@@ -7,6 +8,18 @@ interface Props {
 }
 
 const { title, description = 'Math Solution & Exam Center Mymensingh - Your path to mathematical excellence' } = Astro.props;
+
+let isLoggedIn = false;
+let userRole = '';
+try {
+  const { supabase } = createClient(Astro.request, Astro.cookies);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    isLoggedIn = true;
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    userRole = profile?.role || 'student';
+  }
+} catch {}
 ---
 
 <!DOCTYPE html>
@@ -45,7 +58,17 @@ const { title, description = 'Math Solution & Exam Center Mymensingh - Your path
         </div>
 
         <div class="flex items-center gap-3">
-          <a href="/login" class="btn-ghost hidden sm:inline-flex">Login</a>
+          {isLoggedIn ? (
+            <>
+              <a href={userRole === 'admin' ? '/admin/' : '/dashboard/'} class="btn-ghost hidden sm:inline-flex">Dashboard</a>
+              <a href="/logout" class="btn-ghost hidden sm:inline-flex">Logout</a>
+            </>
+          ) : (
+            <>
+              <a href="/login" class="btn-ghost hidden sm:inline-flex">Login</a>
+              <a href="/register" class="btn-ghost hidden sm:inline-flex">Register</a>
+            </>
+          )}
           <a href="/admission" class="btn-primary text-sm !px-4 !py-2">Enroll Now</a>
         </div>
 
@@ -65,7 +88,17 @@ const { title, description = 'Math Solution & Exam Center Mymensingh - Your path
         <a href="/notice" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Notices</a>
         <a href="/gallery" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Gallery</a>
         <a href="/contact" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Contact</a>
-        <a href="/login" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Login</a>
+        {isLoggedIn ? (
+          <>
+            <a href={userRole === 'admin' ? '/admin/' : '/dashboard/'} class="block px-4 py-2 rounded-lg hover:bg-slate-100">Dashboard</a>
+            <a href="/logout" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Logout</a>
+          </>
+        ) : (
+          <>
+            <a href="/login" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Login</a>
+            <a href="/register" class="block px-4 py-2 rounded-lg hover:bg-slate-100">Register</a>
+          </>
+        )}
       </div>
     </div>
   </nav>
