@@ -34,10 +34,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return Response.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
   }
 
-  if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) {
     console.error('[signup] Missing Supabase env vars — account cannot be created.');
     return Response.json(
-      { error: 'Online registration is not available right now. Please contact the center office to enroll.' },
+      { error: 'Online registration is not available right now. Please contact the center office.' },
       { status: 503 }
     );
   }
@@ -64,19 +66,22 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return Response.json({ error: 'Could not create account. Please try again.' }, { status: 500 });
     }
 
-    // The handle_new_user trigger creates the profile row (with a
-    // server-generated Student ID) in the same transaction.
     if (data.session) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('student_id')
-        .eq('id', data.user.id)
-        .single();
+      const accessToken = data.session.access_token;
+      const resp = await fetch(
+        `${supabaseUrl}/rest/v1/profiles?id=eq.${data.user.id}&select=student_id`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const rows = await resp.json();
+      const profile = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
       return Response.json({ redirect: '/dashboard/', studentId: profile?.student_id ?? null });
     }
 
-    // Email confirmation is enabled: no session yet, profile exists but
-    // is not readable until the user confirms and signs in.
     return Response.json({ needsConfirmation: true });
   } catch (err) {
     console.error('[signup] failed:', err);
