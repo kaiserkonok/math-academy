@@ -1,5 +1,11 @@
 ---
 import StudentLayout from '../../layouts/StudentLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+
+const supabase = createClient(Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const studentName = profile?.full_name || 'Student';
 
 const exams = [
   {
@@ -118,7 +124,7 @@ const stats = {
 };
 ---
 
-<StudentLayout title="Online Exams" studentName="Rahim Uddin">
+<StudentLayout title="Online Exams" studentName={studentName}>
   <!-- Page Header -->
   <div class="mb-8">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

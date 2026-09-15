@@ -1,5 +1,11 @@
 ---
 import StudentLayout from '../../../layouts/StudentLayout.astro';
+import { createClient } from '../../../lib/supabase-server';
+
+const supabase = createClient(Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const studentName = profile?.full_name || 'Student';
 
 const examData = {
   id: 1,
@@ -61,7 +67,7 @@ const examData = {
 };
 ---
 
-<StudentLayout title={`Exam - ${examData.title}`} studentName="Rahim Uddin">
+<StudentLayout title={`Exam - ${examData.title}`} studentName={studentName}>
   <div id="exam-container" class="fixed inset-0 lg:relative lg:inset-auto lg:h-auto bg-slate-50 lg:bg-transparent z-40 lg:z-auto">
     <!-- Top Bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">

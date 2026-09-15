@@ -1,5 +1,11 @@
 ---
 import StudentLayout from '../../layouts/StudentLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+
+const supabase = createClient(Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const studentName = profile?.full_name || 'Student';
 
 const today = new Date();
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -92,7 +98,7 @@ const accentDots: Record<string, string> = {
 };
 ---
 
-<StudentLayout title="My Routine" studentName="Rahim Ahmed">
+<StudentLayout title="My Routine" studentName={studentName}>
 
   <!-- Page Header -->
   <section class="mb-8">

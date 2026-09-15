@@ -1,17 +1,21 @@
 ---
 import StudentLayout from '../../layouts/StudentLayout.astro';
+import { createClient } from '../../lib/supabase-server';
 
-const studentName = 'Rafiq Ahmed';
+const supabase = createClient(Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const { data: profile } = await supabase.from('profiles').select('*').eq('id', user?.id).single();
+const studentName = profile?.full_name || 'Student';
 const studentData = {
-  name: 'Rafiq Ahmed',
-  studentId: 'MA-2026-0142',
-  class: 'Class 8',
-  batch: 'Batch A',
-  email: 'rafiq.ahmed@email.com',
-  phone: '+880 1712-345678',
-  parentName: 'Ahmed Hassan',
-  parentPhone: '+880 1812-345678',
-  address: '42/D, Mirpur Road, Dhaka 1216',
+  name: profile?.full_name || 'Student',
+  studentId: profile?.student_id || 'N/A',
+  class: profile?.grade ? `Class ${profile.grade}` : 'N/A',
+  batch: profile?.batch || 'N/A',
+  email: user?.email || 'N/A',
+  phone: profile?.phone || 'N/A',
+  parentName: profile?.parent_name || 'N/A',
+  parentPhone: profile?.parent_phone || 'N/A',
+  address: profile?.address || 'N/A',
 };
 ---
 
