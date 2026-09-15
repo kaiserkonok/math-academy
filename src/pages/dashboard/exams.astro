@@ -4,117 +4,67 @@ import { createClient } from '../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
-const exams = [
-  {
-    id: 1,
-    title: 'Algebra Chapter 1 - Linear Equations',
-    class: 'Class 9',
-    chapter: 'Chapter 1',
-    type: 'chapter',
-    duration: 30,
-    totalMarks: 25,
-    questions: 15,
-    status: 'available',
-    startDate: '2026-09-10',
-    endDate: '2026-09-20',
-  },
-  {
-    id: 2,
-    title: 'Geometry Chapter 3 - Triangles',
-    class: 'Class 9',
-    chapter: 'Chapter 3',
-    type: 'chapter',
-    duration: 40,
-    totalMarks: 30,
-    questions: 18,
-    status: 'completed',
-    score: 24,
-    startDate: '2026-09-05',
-    endDate: '2026-09-12',
-  },
-  {
-    id: 3,
-    title: 'SSC Model Test - Mathematics',
-    class: 'Class 10',
-    chapter: 'Full Syllabus',
-    type: 'model',
-    duration: 120,
-    totalMarks: 100,
-    questions: 40,
-    status: 'available',
-    startDate: '2026-09-15',
-    endDate: '2026-09-25',
-  },
-  {
-    id: 4,
-    title: 'Algebra Chapter 2 - Polynomials',
-    class: 'Class 9',
-    chapter: 'Chapter 2',
-    type: 'chapter',
-    duration: 30,
-    totalMarks: 25,
-    questions: 15,
-    status: 'upcoming',
-    startDate: '2026-09-22',
-    endDate: '2026-09-30',
-  },
-  {
-    id: 5,
-    title: 'Weekly Math Series - Week 5',
-    class: 'Class 9',
-    chapter: 'Mixed Topics',
-    type: 'series',
-    duration: 45,
-    totalMarks: 50,
-    questions: 25,
-    status: 'available',
-    startDate: '2026-09-14',
-    endDate: '2026-09-18',
-  },
-  {
-    id: 6,
-    title: 'Trigonometry Chapter 1 - Ratios',
-    class: 'Class 10',
-    chapter: 'Chapter 1',
-    type: 'chapter',
-    duration: 35,
-    totalMarks: 30,
-    questions: 20,
-    status: 'completed',
-    score: 28,
-    startDate: '2026-09-01',
-    endDate: '2026-09-08',
-  },
-  {
-    id: 7,
-    title: 'JSC Model Test - Mathematics',
-    class: 'Class 8',
-    chapter: 'Full Syllabus',
-    type: 'model',
-    duration: 90,
-    totalMarks: 80,
-    questions: 35,
-    status: 'available',
-    startDate: '2026-09-13',
-    endDate: '2026-09-22',
-  },
-  {
-    id: 8,
-    title: 'Weekly Math Series - Week 6',
-    class: 'Class 10',
-    chapter: 'Mixed Topics',
-    type: 'series',
-    duration: 50,
-    totalMarks: 60,
-    questions: 30,
-    status: 'upcoming',
-    startDate: '2026-09-21',
-    endDate: '2026-09-28',
-  },
-];
+// Fetch all exams for student's grade
+const { data: examsData } = await supabase
+  .from('exams')
+  .select('*')
+  .eq('grade', profile?.grade)
+  .order('created_at', { ascending: false });
+
+// Fetch question counts for these exams
+const examIds = (examsData || []).map(e => e.id);
+const { data: questionsData } = await supabase
+  .from('questions')
+  .select('exam_id')
+  .in('exam_id', examIds.length > 0 ? examIds : ['00000000-0000-0000-0000-000000000000']);
+
+const questionCounts: Record<string, number> = {};
+(questionsData || []).forEach(q => {
+  questionCounts[q.exam_id] = (questionCounts[q.exam_id] || 0) + 1;
+});
+
+// Fetch student's attempt statuses
+const { data: attemptsData } = await supabase
+  .from('exam_attempts')
+  .select('exam_id, status, obtained_marks')
+  .eq('student_id', profile?.id)
+  .order('id', { ascending: false });
+
+const attemptStatuses: Record<string, string> = {};
+const attemptScores: Record<string, number> = {};
+(attemptsData || []).forEach(a => {
+  if (!attemptStatuses[a.exam_id]) {
+    attemptStatuses[a.exam_id] = a.status;
+    attemptScores[a.exam_id] = a.obtained_marks || 0;
+  }
+});
+
+const exams = (examsData || []).map(e => {
+  let status = 'available';
+  if (!e.is_published) {
+    status = 'upcoming';
+  } else if (attemptStatuses[e.id]) {
+    status = 'completed';
+  }
+
+  return {
+    id: e.id,
+    title: e.title,
+    class: `Class ${e.grade}`,
+    chapter: e.chapter || 'Full Syllabus',
+    type: e.exam_type || 'chapter',
+    duration: e.duration_minutes || 30,
+    totalMarks: e.total_marks || 100,
+    questions: questionCounts[e.id] || 0,
+    status,
+    score: attemptScores[e.id],
+    startDate: e.created_at ? new Date(e.created_at).toISOString().split('T')[0] : '',
+    endDate: e.created_at ? new Date(e.created_at).toISOString().split('T')[0] : '',
+  };
+});
 
 const stats = {
   total: exams.length,
@@ -172,150 +122,162 @@ const stats = {
 
   <!-- Exam Cards Grid -->
   <div id="exam-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
-    {exams.map((exam) => {
-      const typeColors: Record<string, { bg: string; border: string; badge: string; icon: string }> = {
-        chapter: {
-          bg: 'bg-primary-50',
-          border: 'border-primary-200',
-          badge: 'bg-primary-100 text-primary-700',
-          icon: 'text-primary-500',
-        },
-        model: {
-          bg: 'bg-secondary-50',
-          border: 'border-secondary-200',
-          badge: 'bg-secondary-100 text-secondary-700',
-          icon: 'text-secondary-500',
-        },
-        series: {
-          bg: 'bg-accent-50',
-          border: 'border-accent-200',
-          badge: 'bg-accent-100 text-accent-700',
-          icon: 'text-accent-500',
-        },
-      };
+    {exams.length === 0 ? (
+      <div class="col-span-full text-center py-16">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+          <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-700 mb-1">No exams available</h3>
+        <p class="text-sm text-slate-500">Check back later for new exams.</p>
+      </div>
+    ) : (
+      exams.map((exam) => {
+        const typeColors: Record<string, { bg: string; border: string; badge: string; icon: string }> = {
+          chapter: {
+            bg: 'bg-primary-50',
+            border: 'border-primary-200',
+            badge: 'bg-primary-100 text-primary-700',
+            icon: 'text-primary-500',
+          },
+          model: {
+            bg: 'bg-secondary-50',
+            border: 'border-secondary-200',
+            badge: 'bg-secondary-100 text-secondary-700',
+            icon: 'text-secondary-500',
+          },
+          series: {
+            bg: 'bg-accent-50',
+            border: 'border-accent-200',
+            badge: 'bg-accent-100 text-accent-700',
+            icon: 'text-accent-500',
+          },
+        };
 
-      const statusStyles: Record<string, { dot: string; text: string; bg: string }> = {
-        available: { dot: 'bg-success-500', text: 'text-success-700', bg: 'bg-success-50' },
-        completed: { dot: 'bg-slate-400', text: 'text-slate-600', bg: 'bg-slate-100' },
-        upcoming: { dot: 'bg-warning-500', text: 'text-warning-700', bg: 'bg-warning-50' },
-      };
+        const statusStyles: Record<string, { dot: string; text: string; bg: string }> = {
+          available: { dot: 'bg-success-500', text: 'text-success-700', bg: 'bg-success-50' },
+          completed: { dot: 'bg-slate-400', text: 'text-slate-600', bg: 'bg-slate-100' },
+          upcoming: { dot: 'bg-warning-500', text: 'text-warning-700', bg: 'bg-warning-50' },
+        };
 
-      const colors = typeColors[exam.type];
-      const status = statusStyles[exam.status];
+        const colors = typeColors[exam.type] || typeColors.chapter;
+        const status = statusStyles[exam.status] || statusStyles.available;
 
-      return (
-        <div
-          class="exam-card bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-          data-type={exam.type}
-          data-status={exam.status}
-        >
-          {/* Card Header */}
-          <div class={`${colors.bg} px-5 py-4 border-b ${colors.border}`}>
-            <div class="flex items-start justify-between">
-              <div class="flex items-center gap-2">
-                <span class={`px-2.5 py-1 rounded-lg text-xs font-semibold ${colors.badge}`}>
-                  {exam.type === 'chapter' ? 'Chapter Exam' : exam.type === 'model' ? 'Model Test' : 'Series Exam'}
-                </span>
-              </div>
-              <div class={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${status.bg}`}>
-                <div class={`w-1.5 h-1.5 rounded-full ${status.dot}`}></div>
-                <span class={`text-xs font-semibold ${status.text}`}>
-                  {exam.status.charAt(0).toUpperCase() + exam.status.slice(1)}
-                </span>
-              </div>
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mt-3 leading-tight">{exam.title}</h3>
-          </div>
-
-          {/* Card Body */}
-          <div class="px-5 py-4">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.class}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.chapter}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.duration} min</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.totalMarks} marks</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.questions} questions</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span class="text-sm text-slate-600">{exam.startDate} - {exam.endDate}</span>
-              </div>
-            </div>
-
-            {/* Score Display for Completed */}
-            {exam.status === 'completed' && exam.score !== undefined && (
-              <div class="mt-4 p-3 bg-slate-50 rounded-xl">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-slate-600">Your Score</span>
-                  <span class="text-lg font-bold text-primary-600">{exam.score}/{exam.totalMarks}</span>
+        return (
+          <div
+            class="exam-card bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            data-type={exam.type}
+            data-status={exam.status}
+          >
+            {/* Card Header */}
+            <div class={`${colors.bg} px-5 py-4 border-b ${colors.border}`}>
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-2">
+                  <span class={`px-2.5 py-1 rounded-lg text-xs font-semibold ${colors.badge}`}>
+                    {exam.type === 'chapter' ? 'Chapter Exam' : exam.type === 'model' ? 'Model Test' : 'Series Exam'}
+                  </span>
                 </div>
-                <div class="mt-2 h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
-                    style={`width: ${(exam.score / exam.totalMarks) * 100}%`}
-                  ></div>
+                <div class={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${status.bg}`}>
+                  <div class={`w-1.5 h-1.5 rounded-full ${status.dot}`}></div>
+                  <span class={`text-xs font-semibold ${status.text}`}>
+                    {exam.status.charAt(0).toUpperCase() + exam.status.slice(1)}
+                  </span>
                 </div>
               </div>
-            )}
-          </div>
+              <h3 class="text-lg font-bold text-slate-900 mt-3 leading-tight">{exam.title}</h3>
+            </div>
 
-          {/* Card Footer */}
-          <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            {exam.status === 'available' && (
-              <button class="w-full py-2.5 px-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-sm hover:shadow-md">
-                Start Exam
-              </button>
-            )}
-            {exam.status === 'completed' && (
-              <div class="flex gap-2">
-                <button class="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-all duration-200">
-                  Review
-                </button>
-                <button class="flex-1 py-2.5 px-4 bg-primary-50 text-primary-700 font-semibold rounded-xl hover:bg-primary-100 transition-all duration-200">
-                  Retake
-                </button>
-              </div>
-            )}
-            {exam.status === 'upcoming' && (
-              <div class="text-center">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-warning-50 text-warning-700 rounded-xl">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Card Body */}
+            <div class="px-5 py-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <span class="text-sm text-slate-600">{exam.class}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span class="text-sm text-slate-600">{exam.chapter}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span class="text-sm font-semibold">Starts on {exam.startDate}</span>
+                  <span class="text-sm text-slate-600">{exam.duration} min</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-sm text-slate-600">{exam.totalMarks} marks</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-sm text-slate-600">{exam.questions} questions</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span class="text-sm text-slate-600">{exam.startDate} - {exam.endDate}</span>
                 </div>
               </div>
-            )}
+
+              {/* Score Display for Completed */}
+              {exam.status === 'completed' && exam.score !== undefined && (
+                <div class="mt-4 p-3 bg-slate-50 rounded-xl">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-600">Your Score</span>
+                    <span class="text-lg font-bold text-primary-600">{exam.score}/{exam.totalMarks}</span>
+                  </div>
+                  <div class="mt-2 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
+                      style={`width: ${(exam.score / exam.totalMarks) * 100}%`}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Card Footer */}
+            <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+              {exam.status === 'available' && (
+                <a href={`/dashboard/exam/${exam.id}`} class="block w-full py-2.5 px-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-sm hover:shadow-md text-center">
+                  Start Exam
+                </a>
+              )}
+              {exam.status === 'completed' && (
+                <div class="flex gap-2">
+                  <button class="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-all duration-200">
+                    Review
+                  </button>
+                  <a href={`/dashboard/exam/${exam.id}`} class="flex-1 py-2.5 px-4 bg-primary-50 text-primary-700 font-semibold rounded-xl hover:bg-primary-100 transition-all duration-200 text-center">
+                    Retake
+                  </a>
+                </div>
+              )}
+              {exam.status === 'upcoming' && (
+                <div class="text-center">
+                  <div class="inline-flex items-center gap-2 px-4 py-2 bg-warning-50 text-warning-700 rounded-xl">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-sm font-semibold">Starts on {exam.startDate}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      );
-    })}
+        );
+      })
+    )}
   </div>
 
   <!-- Exam Instructions -->
@@ -368,7 +330,7 @@ const stats = {
         <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
           <div class="w-8 h-8 rounded-lg bg-success-100 flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" />
             </svg>
           </div>
           <div>

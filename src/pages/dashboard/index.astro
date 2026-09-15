@@ -4,39 +4,84 @@ import { createClient } from '../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
 const today = new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 const motivationalQuote = "Success is the sum of small efforts, repeated day in and day out.";
 
+// Fetch exam attempts for this student
+const { data: attempts } = await supabase
+  .from('exam_attempts')
+  .select('percentage, time_taken_seconds')
+  .eq('student_id', profile?.id)
+  .order('submitted_at', { ascending: false });
+
+const examsTaken = attempts?.length || 0;
+const avgScore = attempts?.length
+  ? Math.round(attempts.reduce((sum, a) => sum + (a.percentage || 0), 0) / attempts.length)
+  : 0;
+const totalStudySeconds = attempts?.reduce((sum, a) => sum + (a.time_taken_seconds || 0), 0) || 0;
+const studyHours = Math.round(totalStudySeconds / 3600);
+
+// Count published exams for student's grade
+const { count: publishedExamsCount } = await supabase
+  .from('exams')
+  .select('*', { count: 'exact', head: true })
+  .eq('is_published', true)
+  .eq('grade', profile?.grade);
+
 const stats = [
-  { label: 'Exams Taken', value: '12', icon: 'clipboard', color: 'primary' },
-  { label: 'Average Score', value: '78%', icon: 'chart', color: 'success' },
-  { label: 'Upcoming Exams', value: '3', icon: 'calendar', color: 'warning' },
-  { label: 'Study Hours', value: '48h', icon: 'clock', color: 'secondary' },
+  { label: 'Exams Taken', value: String(examsTaken), icon: 'clipboard', color: 'primary' },
+  { label: 'Average Score', value: `${avgScore}%`, icon: 'chart', color: 'success' },
+  { label: 'Upcoming Exams', value: String(publishedExamsCount || 0), icon: 'calendar', color: 'warning' },
+  { label: 'Study Hours', value: `${studyHours}h`, icon: 'clock', color: 'secondary' },
 ];
 
-const recentExams = [
-  { name: 'Algebra - Chapter 5 Test', date: 'Sep 10, 2026', score: '85/100', status: 'Pass' },
-  { name: 'Calculus - Midterm', date: 'Sep 5, 2026', score: '72/100', status: 'Pass' },
-  { name: 'Geometry - Quiz 3', date: 'Sep 1, 2026', score: '45/100', status: 'Fail' },
-  { name: 'Trigonometry - Chapter 2', date: 'Aug 28, 2026', score: '91/100', status: 'Pass' },
-  { name: 'Statistics - Unit Test', date: 'Aug 22, 2026', score: '78/100', status: 'Pass' },
-];
+// Recent exams - last 5 attempts with exam title
+const { data: recentAttempts } = await supabase
+  .from('exam_attempts')
+  .select('*, exams!inner(title)')
+  .eq('student_id', profile?.id)
+  .order('submitted_at', { ascending: false })
+  .limit(5);
 
-const upcomingExams = [
-  { name: 'Calculus - Final Exam', date: 'Sep 20, 2026', time: '9:00 AM', duration: '3 hours' },
-  { name: 'Algebra - Chapter 6 Test', date: 'Sep 25, 2026', time: '2:00 PM', duration: '1.5 hours' },
-  { name: 'Geometry - Midterm', date: 'Sep 30, 2026', time: '10:00 AM', duration: '2 hours' },
-];
+const recentExams = (recentAttempts || []).map(a => ({
+  name: a.exams?.title || 'Unknown Exam',
+  date: a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+  score: `${a.obtained_marks || 0}/${a.total_marks || 0}`,
+  status: a.is_passed ? 'Pass' : 'Fail',
+}));
 
-const notices = [
-  { title: 'Holiday Notice - September 16', date: 'Sep 12, 2026', important: true },
-  { title: 'New Study Materials Uploaded', date: 'Sep 11, 2026', important: false },
-  { title: 'Exam Schedule Updated', date: 'Sep 10, 2026', important: true },
-];
+// Upcoming exams - published exams for student's grade
+const { data: upcomingExamsData } = await supabase
+  .from('exams')
+  .select('*')
+  .eq('is_published', true)
+  .eq('grade', profile?.grade)
+  .order('created_at', { ascending: false })
+  .limit(3);
+
+const upcomingExams = (upcomingExamsData || []).map(e => ({
+  name: e.title,
+  date: e.created_at ? new Date(e.created_at).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+  time: e.duration_minutes ? `${e.duration_minutes} min` : 'N/A',
+  duration: `${e.duration_minutes || 0} minutes`,
+}));
+
+// Recent notices
+const { data: noticesData } = await supabase
+  .from('notices')
+  .select('*')
+  .order('published_at', { ascending: false })
+  .limit(3);
+
+const notices = (noticesData || []).map(n => ({
+  title: n.title,
+  date: n.published_at ? new Date(n.published_at).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+  important: n.is_important,
+}));
 ---
 
 <StudentLayout title="Dashboard" studentName={studentName}>
@@ -112,22 +157,28 @@ const notices = [
               </tr>
             </thead>
             <tbody>
-              {recentExams.map((exam) => (
-                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                  <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.name}</td>
-                  <td class="px-5 py-4 text-sm text-slate-500">{exam.date}</td>
-                  <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.score}</td>
-                  <td class="px-5 py-4">
-                    <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      exam.status === 'Pass'
-                        ? 'bg-success-500/10 text-success-600'
-                        : 'bg-danger-500/10 text-danger-600'
-                    }`}>
-                      {exam.status}
-                    </span>
-                  </td>
+              {recentExams.length === 0 ? (
+                <tr>
+                  <td colspan="4" class="px-5 py-8 text-center text-slate-400">No exams taken yet</td>
                 </tr>
-              ))}
+              ) : (
+                recentExams.map((exam) => (
+                  <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.name}</td>
+                    <td class="px-5 py-4 text-sm text-slate-500">{exam.date}</td>
+                    <td class="px-5 py-4 text-sm font-medium text-slate-900">{exam.score}</td>
+                    <td class="px-5 py-4">
+                      <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        exam.status === 'Pass'
+                          ? 'bg-success-500/10 text-success-600'
+                          : 'bg-danger-500/10 text-danger-600'
+                      }`}>
+                        {exam.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -181,31 +232,35 @@ const notices = [
           <h2 class="text-lg font-semibold text-slate-900">Upcoming Exams</h2>
         </div>
         <div class="p-5 space-y-4">
-          {upcomingExams.map((exam) => (
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <h3 class="font-semibold text-slate-900 text-sm mb-2">{exam.name}</h3>
-              <div class="flex items-center gap-4 text-xs text-slate-500">
-                <span class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {exam.date}
-                </span>
-                <span class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {exam.time}
-                </span>
-                <span class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  {exam.duration}
-                </span>
+          {upcomingExams.length === 0 ? (
+            <p class="text-sm text-slate-400 text-center py-4">No upcoming exams</p>
+          ) : (
+            upcomingExams.map((exam) => (
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <h3 class="font-semibold text-slate-900 text-sm mb-2">{exam.name}</h3>
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {exam.date}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {exam.time}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {exam.duration}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -215,24 +270,28 @@ const notices = [
           <h2 class="text-lg font-semibold text-slate-900">Recent Notices</h2>
         </div>
         <div class="p-5 space-y-3">
-          {notices.map((notice) => (
-            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-              <div class={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
-                notice.important ? 'bg-danger-500' : 'bg-slate-300'
-              }`}></div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <h3 class="text-sm font-medium text-slate-900 truncate">{notice.title}</h3>
-                  {notice.important && (
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-danger-500/10 text-danger-600">
-                      IMPORTANT
-                    </span>
-                  )}
+          {notices.length === 0 ? (
+            <p class="text-sm text-slate-400 text-center py-4">No notices</p>
+          ) : (
+            notices.map((notice) => (
+              <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                <div class={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
+                  notice.important ? 'bg-danger-500' : 'bg-slate-300'
+                }`}></div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="text-sm font-medium text-slate-900 truncate">{notice.title}</h3>
+                    {notice.important && (
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-danger-500/10 text-danger-600">
+                        IMPORTANT
+                      </span>
+                    )}
+                  </div>
+                  <p class="text-xs text-slate-500">{notice.date}</p>
                 </div>
-                <p class="text-xs text-slate-500">{notice.date}</p>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

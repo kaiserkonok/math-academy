@@ -4,70 +4,45 @@ import { createClient } from '../../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
-const examData = {
-  id: 1,
-  title: 'Algebra Chapter 1 - Linear Equations',
-  duration: 30,
-  totalQuestions: 5,
-  questions: [
-    {
-      id: 1,
-      text: 'Solve for x: 2x + 5 = 13',
-      options: [
-        { label: 'A', text: 'x = 3' },
-        { label: 'B', text: 'x = 4' },
-        { label: 'C', text: 'x = 5' },
-        { label: 'D', text: 'x = 6' },
-      ],
-    },
-    {
-      id: 2,
-      text: 'What is the value of x in the equation 3x - 7 = 8?',
-      options: [
-        { label: 'A', text: 'x = 3' },
-        { label: 'B', text: 'x = 4' },
-        { label: 'C', text: 'x = 5' },
-        { label: 'D', text: 'x = 6' },
-      ],
-    },
-    {
-      id: 3,
-      text: 'Simplify: 4(x + 2) - 3x',
-      options: [
-        { label: 'A', text: 'x + 8' },
-        { label: 'B', text: 'x + 2' },
-        { label: 'C', text: '7x + 2' },
-        { label: 'D', text: 'x + 6' },
-      ],
-    },
-    {
-      id: 4,
-      text: 'If 5x + 3 = 2x + 18, find x.',
-      options: [
-        { label: 'A', text: 'x = 3' },
-        { label: 'B', text: 'x = 4' },
-        { label: 'C', text: 'x = 5' },
-        { label: 'D', text: 'x = 6' },
-      ],
-    },
-    {
-      id: 5,
-      text: 'Solve: 2(x - 3) = 4x + 6',
-      options: [
-        { label: 'A', text: 'x = -6' },
-        { label: 'B', text: 'x = -3' },
-        { label: 'C', text: 'x = 3' },
-        { label: 'D', text: 'x = 6' },
-      ],
-    },
-  ],
+const { id } = Astro.params;
+
+// Fetch exam with questions
+const { data: examData, error: examError } = await supabase
+  .from('exams')
+  .select('*, questions(*)')
+  .eq('id', id)
+  .eq('is_published', true)
+  .single();
+
+if (examError || !examData) {
+  return Astro.redirect('/dashboard/exams');
+}
+
+const questions = (examData.questions || [])
+  .sort((a: any, b: any) => (a.question_order || 0) - (b.question_order || 0))
+  .map((q: any) => ({
+    id: q.question_order || q.id,
+    text: q.question_text,
+    options: [
+      { label: 'A', text: q.option_a || '' },
+      { label: 'B', text: q.option_b || '' },
+      { label: 'C', text: q.option_c || '' },
+      { label: 'D', text: q.option_d || '' },
+    ],
+  }));
+
+const examInfo = {
+  id: examData.id,
+  title: examData.title,
+  duration: examData.duration_minutes || 30,
+  totalQuestions: questions.length,
 };
 ---
 
-<StudentLayout title={`Exam - ${examData.title}`} studentName={studentName}>
+<StudentLayout title={`Exam - ${examInfo.title}`} studentName={studentName}>
   <div id="exam-container" class="fixed inset-0 lg:relative lg:inset-auto lg:h-auto bg-slate-50 lg:bg-transparent z-40 lg:z-auto">
     <!-- Top Bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
@@ -80,7 +55,7 @@ const examData = {
             </svg>
           </div>
           <div>
-            <h1 class="text-sm lg:text-base font-bold text-slate-900 truncate max-w-[180px] lg:max-w-md">{examData.title}</h1>
+            <h1 class="text-sm lg:text-base font-bold text-slate-900 truncate max-w-[180px] lg:max-w-md">{examInfo.title}</h1>
             <p class="text-xs text-slate-500 hidden sm:block">Math Solution & Exam Center</p>
           </div>
         </div>
@@ -99,7 +74,7 @@ const examData = {
             <span class="text-xs text-primary-600 font-medium">Q</span>
             <span id="current-q-num" class="text-sm font-bold text-primary-700">1</span>
             <span class="text-xs text-primary-400">/</span>
-            <span class="text-sm font-bold text-primary-600">{examData.totalQuestions}</span>
+            <span class="text-sm font-bold text-primary-600">{examInfo.totalQuestions}</span>
           </div>
         </div>
       </div>
@@ -119,7 +94,7 @@ const examData = {
                   <span class="w-10 h-10 rounded-xl bg-primary-500 text-white flex items-center justify-center font-bold text-sm" id="question-badge">1</span>
                   <div>
                     <span class="text-xs text-slate-500 font-medium">Question</span>
-                    <h2 id="question-text" class="text-base lg:text-lg font-semibold text-slate-900 leading-relaxed">{examData.questions[0].text}</h2>
+                    <h2 id="question-text" class="text-base lg:text-lg font-semibold text-slate-900 leading-relaxed">{questions[0]?.text || ''}</h2>
                   </div>
                 </div>
                 <button id="mark-review-btn" class="hidden lg:flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-warning-600 hover:bg-warning-50 rounded-xl transition-all duration-200" title="Mark for Review">
@@ -133,13 +108,9 @@ const examData = {
 
             <!-- Options -->
             <div id="options-container" class="p-5 space-y-3">
-              {examData.questions[0].options.map((option, i) => (
+              {(questions[0]?.options || []).map((option: any, i: number) => (
                 <button
-                  class={`option-btn w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 ${
-                    i === 0
-                      ? 'border-slate-200 hover:border-primary-300 hover:bg-primary-50/50'
-                      : 'border-slate-200 hover:border-primary-300 hover:bg-primary-50/50'
-                  }`}
+                  class={`option-btn w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 border-slate-200 hover:border-primary-300 hover:bg-primary-50/50`}
                   data-option={option.label}
                 >
                   <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-sm text-slate-600 flex-shrink-0 option-label">
@@ -222,7 +193,7 @@ const examData = {
 
           <!-- Question Grid -->
           <div id="question-grid" class="grid grid-cols-5 gap-2">
-            {Array.from({ length: examData.totalQuestions }, (_, i) => (
+            {Array.from({ length: examInfo.totalQuestions }, (_, i) => (
               <button
                 class={`q-nav-btn w-full aspect-square rounded-xl font-bold text-sm transition-all duration-200 ${
                   i === 0
@@ -258,7 +229,7 @@ const examData = {
             </div>
             <div class="flex items-center justify-between text-sm">
               <span class="text-slate-600">Unvisited</span>
-              <span id="unvisited-count" class="font-bold text-slate-500">{examData.totalQuestions}</span>
+              <span id="unvisited-count" class="font-bold text-slate-500">{examInfo.totalQuestions}</span>
             </div>
             <div class="flex items-center justify-between text-sm">
               <span class="text-slate-600">Not Answered</span>
@@ -267,7 +238,7 @@ const examData = {
             <div class="pt-2 border-t border-slate-200">
               <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-700">Total Questions</span>
-                <span class="font-bold text-slate-900">{examData.totalQuestions}</span>
+                <span class="font-bold text-slate-900">{examInfo.totalQuestions}</span>
               </div>
             </div>
           </div>
@@ -385,7 +356,7 @@ const examData = {
     </div>
   </div>
 
-  <script define:vars={{ questions: examData.questions, totalQuestions: examData.totalQuestions, duration: examData.duration }}>
+  <script define:vars={{ questions, totalQuestions: examInfo.totalQuestions, duration: examInfo.duration, examId: examInfo.id }}>
     (function () {
       // State
       let currentQuestion = 0;
@@ -472,8 +443,6 @@ const examData = {
               ? 'border-primary-500 bg-primary-50'
               : 'border-slate-200 hover:border-primary-300 hover:bg-primary-50/50');
           btn.setAttribute('data-option', opt.label);
-          // Static skeleton only — user-controlled text is set via
-          // textContent below so option text can never inject HTML.
           btn.innerHTML =
             '<span class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 option-label ' +
             (isSelected ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600') +

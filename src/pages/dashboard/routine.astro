@@ -4,63 +4,65 @@ import { createClient } from '../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
 const today = new Date();
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const daysOfWeek = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
 
-const classRoutine: Record<string, Array<{ time: string; subject: string; chapter: string; room: string }>> = {
-  Saturday: [
-    { time: '4:00 - 4:45 PM', subject: 'Algebra', chapter: 'Ch: 3 - Linear Equations', room: 'Room 101' },
-    { time: '4:45 - 5:30 PM', subject: 'Geometry', chapter: 'Ch: 5 - Triangles', room: 'Room 101' },
-    { time: '5:45 - 6:30 PM', subject: 'Physics', chapter: 'Ch: 2 - Motion', room: 'Room 203' },
-    { time: '6:30 - 7:15 PM', subject: 'English', chapter: 'Ch: 4 - Grammar', room: 'Room 203' },
-  ],
-  Sunday: [
-    { time: '4:00 - 4:45 PM', subject: 'Mathematics', chapter: 'Ch: 7 - Statistics', room: 'Room 102' },
-    { time: '4:45 - 5:30 PM', subject: 'Chemistry', chapter: 'Ch: 1 - Matter', room: 'Room 102' },
-    { time: '5:45 - 6:30 PM', subject: 'Bengali', chapter: 'Ch: 6 - Poetry', room: 'Room 301' },
-  ],
-  Monday: [
-    { time: '4:00 - 4:45 PM', subject: 'Algebra', chapter: 'Ch: 4 - Quadratics', room: 'Room 101' },
-    { time: '4:45 - 5:30 PM', subject: 'Geometry', chapter: 'Ch: 6 - Circles', room: 'Room 101' },
-    { time: '5:45 - 6:30 PM', subject: 'Biology', chapter: 'Ch: 3 - Cell Biology', room: 'Room 204' },
-  ],
-  Tuesday: [
-    { time: '4:00 - 4:45 PM', subject: 'Mathematics', chapter: 'Ch: 8 - Probability', room: 'Room 102' },
-    { time: '4:45 - 5:30 PM', subject: 'Physics', chapter: 'Ch: 3 - Forces', room: 'Room 203' },
-    { time: '5:45 - 6:30 PM', subject: 'English', chapter: 'Ch: 5 - Comprehension', room: 'Room 203' },
-    { time: '6:30 - 7:15 PM', subject: 'ICT', chapter: 'Ch: 1 - Fundamentals', room: 'Room 105' },
-  ],
-  Wednesday: [
-    { time: '4:00 - 4:45 PM', subject: 'Algebra', chapter: 'Ch: 5 - Polynomials', room: 'Room 101' },
-    { time: '4:45 - 5:30 PM', subject: 'Chemistry', chapter: 'Ch: 2 - Elements', room: 'Room 102' },
-    { time: '5:45 - 6:30 PM', subject: 'Bengali', chapter: 'Ch: 7 - Drama', room: 'Room 301' },
-  ],
-  Thursday: [
-    { time: '4:00 - 4:45 PM', subject: 'Mathematics', chapter: 'Ch: 9 - Mensuration', room: 'Room 102' },
-    { time: '4:45 - 5:30 PM', subject: 'Geometry', chapter: 'Ch: 7 - Mensuration', room: 'Room 101' },
-    { time: '5:45 - 6:30 PM', subject: 'Physics', chapter: 'Ch: 4 - Energy', room: 'Room 203' },
-  ],
-};
+// Fetch routines for student's grade or grade IS NULL
+const { data: routinesData } = await supabase
+  .from('routines')
+  .select('*')
+  .or(`grade.eq.${profile?.grade},grade.is.null`)
+  .order('date')
+  .order('start_time');
 
-const examRoutine: Record<string, Array<{ time: string; subject: string; chapter: string; type: string }>> = {
-  Saturday: [],
-  Sunday: [
-    { time: '9:00 - 11:00 AM', subject: 'Mathematics', chapter: 'Full Syllabus', type: 'Model Test' },
-  ],
-  Monday: [],
-  Tuesday: [
-    { time: '9:00 - 11:00 AM', subject: 'Physics', chapter: 'Ch 1-5', type: 'Weekly Quiz' },
-  ],
-  Wednesday: [],
-  Thursday: [
-    { time: '9:00 - 11:00 AM', subject: 'Chemistry', chapter: 'Ch 1-4', type: 'Monthly Exam' },
-    { time: '2:00 - 4:00 PM', subject: 'English', chapter: 'Full Syllabus', type: 'Model Test' },
-  ],
-};
+function formatTimeRange(start: string | null, end: string | null): string {
+  if (!start) return 'TBA';
+  if (!end) return start;
+  return `${start} - ${end}`;
+}
+
+function getDayName(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return dayNames[d.getDay()];
+}
+
+// Separate class and exam routines, group by day
+const classRoutine: Record<string, Array<{ time: string; subject: string; chapter: string; room: string }>> = {};
+const examRoutine: Record<string, Array<{ time: string; subject: string; chapter: string; type: string }>> = {};
+
+for (const day of daysOfWeek) {
+  classRoutine[day] = [];
+  examRoutine[day] = [];
+}
+
+for (const r of (routinesData || [])) {
+  if (!r.date) continue;
+  const dayName = getDayName(r.date);
+  if (!classRoutine[dayName]) continue;
+
+  const timeStr = formatTimeRange(r.start_time, r.end_time);
+  const entry = {
+    time: timeStr,
+    subject: r.title || 'General',
+    chapter: r.chapter || 'N/A',
+    room: 'Room 101',
+  };
+
+  if (r.routine_type === 'exam') {
+    examRoutine[dayName].push({
+      time: timeStr,
+      subject: r.title || 'General',
+      chapter: r.chapter || 'N/A',
+      type: r.routine_type || 'Class',
+    });
+  } else {
+    classRoutine[dayName].push(entry);
+  }
+}
 
 const todayDayName = dayNames[today.getDay()];
 const adjustedToday = todayDayName === 'Friday' ? 'Saturday' : todayDayName;
@@ -83,6 +85,7 @@ const examTypeColors: Record<string, string> = {
   'Model Test': 'bg-red-100 text-red-700',
   'Weekly Quiz': 'bg-blue-100 text-blue-700',
   'Monthly Exam': 'bg-purple-100 text-purple-700',
+  'exam': 'bg-purple-100 text-purple-700',
 };
 
 const accentDots: Record<string, string> = {
@@ -96,6 +99,8 @@ const accentDots: Record<string, string> = {
   'Bengali': 'bg-violet-500',
   'ICT': 'bg-cyan-500',
 };
+
+const totalClassesWeek = daysOfWeek.reduce((sum, d) => sum + (classRoutine[d]?.length || 0), 0);
 ---
 
 <StudentLayout title="My Routine" studentName={studentName}>
@@ -334,28 +339,32 @@ const accentDots: Record<string, string> = {
         <div class="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
           <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         </div>
-        <div class="text-2xl font-extrabold text-slate-900">22</div>
+        <div class="text-2xl font-extrabold text-slate-900">{totalClassesWeek}</div>
         <div class="text-xs text-slate-500 mt-1">Total Classes/Week</div>
       </div>
       <div class="card p-4 text-center group hover:-translate-y-1 transition-transform">
         <div class="w-12 h-12 rounded-xl bg-secondary-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
           <svg class="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <div class="text-2xl font-extrabold text-slate-900">13.5</div>
+        <div class="text-2xl font-extrabold text-slate-900">{(totalClassesWeek * 0.45).toFixed(1)}</div>
         <div class="text-xs text-slate-500 mt-1">Hours/Week</div>
       </div>
       <div class="card p-4 text-center group hover:-translate-y-1 transition-transform">
         <div class="w-12 h-12 rounded-xl bg-success-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
           <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
         </div>
-        <div class="text-2xl font-extrabold text-slate-900">9</div>
+        <div class="text-2xl font-extrabold text-slate-900">
+          {new Set((routinesData || []).map(r => r.title).filter(Boolean)).size || 0}
+        </div>
         <div class="text-xs text-slate-500 mt-1">Subjects</div>
       </div>
       <div class="card p-4 text-center group hover:-translate-y-1 transition-transform">
         <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
           <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
-        <div class="text-2xl font-extrabold text-slate-900">3</div>
+        <div class="text-2xl font-extrabold text-slate-900">
+          {daysOfWeek.reduce((sum, d) => sum + (examRoutine[d]?.length || 0), 0)}
+        </div>
         <div class="text-xs text-slate-500 mt-1">Exams This Month</div>
       </div>
     </div>

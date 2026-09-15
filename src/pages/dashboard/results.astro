@@ -4,128 +4,44 @@ import { createClient } from '../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
-const results = [
-  {
-    id: '1',
-    examName: 'Algebra - Chapter 5 Test',
-    date: 'Sep 10, 2026',
-    totalMarks: 100,
-    obtainedMarks: 85,
-    percentage: 85,
-    status: 'Pass',
-    totalQuestions: 20,
-    correct: 17,
-    wrong: 2,
-    skipped: 1,
-    timeTaken: '1h 15m'
-  },
-  {
-    id: '2',
-    examName: 'Calculus - Midterm',
-    date: 'Sep 5, 2026',
-    totalMarks: 100,
-    obtainedMarks: 72,
-    percentage: 72,
-    status: 'Pass',
-    totalQuestions: 25,
-    correct: 18,
-    wrong: 4,
-    skipped: 3,
-    timeTaken: '1h 45m'
-  },
-  {
-    id: '3',
-    examName: 'Geometry - Quiz 3',
-    date: 'Sep 1, 2026',
-    totalMarks: 50,
-    obtainedMarks: 22,
-    percentage: 44,
-    status: 'Fail',
-    totalQuestions: 15,
-    correct: 7,
-    wrong: 5,
-    skipped: 3,
-    timeTaken: '45m'
-  },
-  {
-    id: '4',
-    examName: 'Trigonometry - Chapter 2',
-    date: 'Aug 28, 2026',
-    totalMarks: 100,
-    obtainedMarks: 91,
-    percentage: 91,
-    status: 'Pass',
-    totalQuestions: 20,
-    correct: 18,
-    wrong: 1,
-    skipped: 1,
-    timeTaken: '1h 10m'
-  },
-  {
-    id: '5',
-    examName: 'Statistics - Unit Test',
-    date: 'Aug 22, 2026',
-    totalMarks: 100,
-    obtainedMarks: 78,
-    percentage: 78,
-    status: 'Pass',
-    totalQuestions: 25,
-    correct: 19,
-    wrong: 3,
-    skipped: 3,
-    timeTaken: '1h 30m'
-  },
-  {
-    id: '6',
-    examName: 'Linear Algebra - Quiz 2',
-    date: 'Aug 18, 2026',
-    totalMarks: 50,
-    obtainedMarks: 42,
-    percentage: 84,
-    status: 'Pass',
-    totalQuestions: 10,
-    correct: 8,
-    wrong: 1,
-    skipped: 1,
-    timeTaken: '35m'
-  },
-  {
-    id: '7',
-    examName: 'Number Theory - Assignment 1',
-    date: 'Aug 15, 2026',
-    totalMarks: 50,
-    obtainedMarks: 38,
-    percentage: 76,
-    status: 'Pass',
-    totalQuestions: 10,
-    correct: 7,
-    wrong: 2,
-    skipped: 1,
-    timeTaken: '40m'
-  },
-  {
-    id: '8',
-    examName: 'Probability - Chapter Test',
-    date: 'Aug 10, 2026',
-    totalMarks: 100,
-    obtainedMarks: 65,
-    percentage: 65,
-    status: 'Pass',
-    totalQuestions: 20,
-    correct: 13,
-    wrong: 4,
-    skipped: 3,
-    timeTaken: '1h 20m'
-  }
-];
+// Fetch completed exam attempts with exam titles
+const { data: attemptsData } = await supabase
+  .from('exam_attempts')
+  .select('*, exams!inner(title)')
+  .eq('student_id', profile?.id)
+  .eq('status', 'completed')
+  .order('submitted_at', { ascending: false });
+
+function formatTimeTaken(seconds: number | null): string {
+  if (!seconds) return '0m';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+const results = (attemptsData || []).map(a => ({
+  id: String(a.id),
+  examName: a.exams?.title || 'Unknown Exam',
+  date: a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+  totalMarks: a.total_marks || 0,
+  obtainedMarks: a.obtained_marks || 0,
+  percentage: a.percentage || 0,
+  status: a.is_passed ? 'Pass' : 'Fail',
+  totalQuestions: (a.total_correct || 0) + (a.total_wrong || 0) + (a.total_skipped || 0),
+  correct: a.total_correct || 0,
+  wrong: a.total_wrong || 0,
+  skipped: a.total_skipped || 0,
+  timeTaken: formatTimeTaken(a.time_taken_seconds),
+}));
 
 const totalExams = results.length;
 const passedExams = results.filter(r => r.status === 'Pass').length;
-const passRate = Math.round((passedExams / totalExams) * 100);
-const averageScore = Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / totalExams);
+const passRate = totalExams > 0 ? Math.round((passedExams / totalExams) * 100) : 0;
+const averageScore = totalExams > 0 ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / totalExams) : 0;
 ---
 
 <StudentLayout title="My Results" studentName={studentName}>
@@ -209,75 +125,81 @@ const averageScore = Math.round(results.reduce((sum, r) => sum + r.percentage, 0
           </tr>
         </thead>
         <tbody>
-          {results.map((result) => (
-            <tr class="result-row border-b border-slate-50 hover:bg-slate-50/50 transition-colors" data-status={result.status.toLowerCase()}>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    result.status === 'Pass' ? 'bg-success-500/10 text-success-500' : 'bg-danger-500/10 text-danger-500'
-                  }`}>
-                    {result.status === 'Pass' ? (
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    ) : (
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    )}
+          {results.length === 0 ? (
+            <tr>
+              <td colspan="7" class="px-6 py-12 text-center text-slate-400">No results yet. Take an exam to see your results here.</td>
+            </tr>
+          ) : (
+            results.map((result) => (
+              <tr class="result-row border-b border-slate-50 hover:bg-slate-50/50 transition-colors" data-status={result.status.toLowerCase()}>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      result.status === 'Pass' ? 'bg-success-500/10 text-success-500' : 'bg-danger-500/10 text-danger-500'
+                    }`}>
+                      {result.status === 'Pass' ? (
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                    </div>
+                    <span class="font-medium text-slate-900">{result.examName}</span>
                   </div>
-                  <span class="font-medium text-slate-900">{result.examName}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-slate-500">{result.date}</td>
-              <td class="px-6 py-4 text-sm text-slate-600 text-center font-medium">{result.totalMarks}</td>
-              <td class="px-6 py-4 text-center">
-                <span class={`text-sm font-bold ${
-                  result.percentage >= 70 ? 'text-success-600' : result.percentage >= 50 ? 'text-warning-600' : 'text-danger-600'
-                }`}>
-                  {result.obtainedMarks}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      class={`h-full rounded-full ${
-                        result.percentage >= 70 ? 'bg-success-500' : result.percentage >= 50 ? 'bg-warning-500' : 'bg-danger-500'
-                      }`}
-                      style={`width: ${result.percentage}%`}
-                    ></div>
-                  </div>
-                  <span class={`text-sm font-semibold ${
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-500">{result.date}</td>
+                <td class="px-6 py-4 text-sm text-slate-600 text-center font-medium">{result.totalMarks}</td>
+                <td class="px-6 py-4 text-center">
+                  <span class={`text-sm font-bold ${
                     result.percentage >= 70 ? 'text-success-600' : result.percentage >= 50 ? 'text-warning-600' : 'text-danger-600'
                   }`}>
-                    {result.percentage}%
+                    {result.obtainedMarks}
                   </span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                  result.status === 'Pass'
-                    ? 'bg-success-500/10 text-success-600'
-                    : 'bg-danger-500/10 text-danger-600'
-                }`}>
-                  {result.status}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <a 
-                  href={`/dashboard/result/${result.id}`}
-                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 text-primary-600 text-sm font-semibold hover:bg-primary-100 transition-colors"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  View
-                </a>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <div class="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div 
+                        class={`h-full rounded-full ${
+                          result.percentage >= 70 ? 'bg-success-500' : result.percentage >= 50 ? 'bg-warning-500' : 'bg-danger-500'
+                        }`}
+                        style={`width: ${result.percentage}%`}
+                      ></div>
+                    </div>
+                    <span class={`text-sm font-semibold ${
+                      result.percentage >= 70 ? 'text-success-600' : result.percentage >= 50 ? 'text-warning-600' : 'text-danger-600'
+                    }`}>
+                      {result.percentage}%
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                    result.status === 'Pass'
+                      ? 'bg-success-500/10 text-success-600'
+                      : 'bg-danger-500/10 text-danger-600'
+                  }`}>
+                    {result.status}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <a 
+                    href={`/dashboard/result/${result.id}`}
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 text-primary-600 text-sm font-semibold hover:bg-primary-100 transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    View
+                  </a>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
@@ -285,77 +207,83 @@ const averageScore = Math.round(results.reduce((sum, r) => sum + r.percentage, 0
 
   <!-- Results Cards (Mobile) -->
   <div class="md:hidden space-y-4">
-    {results.map((result) => (
-      <div class="result-card card p-5" data-status={result.status.toLowerCase()}>
-        <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              result.status === 'Pass' ? 'bg-success-500/10 text-success-500' : 'bg-danger-500/10 text-danger-500'
-            }`}>
-              {result.status === 'Pass' ? (
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              ) : (
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              )}
-            </div>
-            <div>
-              <h3 class="font-semibold text-slate-900">{result.examName}</h3>
-              <p class="text-sm text-slate-500">{result.date}</p>
-            </div>
-          </div>
-          <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-            result.status === 'Pass'
-              ? 'bg-success-500/10 text-success-600'
-              : 'bg-danger-500/10 text-danger-600'
-          }`}>
-            {result.status}
-          </span>
-        </div>
-
-        <div class="grid grid-cols-3 gap-4 mb-4">
-          <div class="text-center p-3 bg-slate-50 rounded-xl">
-            <p class="text-lg font-bold text-slate-900">{result.obtainedMarks}</p>
-            <p class="text-xs text-slate-500">Obtained</p>
-          </div>
-          <div class="text-center p-3 bg-slate-50 rounded-xl">
-            <p class="text-lg font-bold text-slate-900">{result.totalMarks}</p>
-            <p class="text-xs text-slate-500">Total</p>
-          </div>
-          <div class="text-center p-3 bg-slate-50 rounded-xl">
-            <p class={`text-lg font-bold ${
-              result.percentage >= 70 ? 'text-success-600' : result.percentage >= 50 ? 'text-warning-600' : 'text-danger-600'
-            }`}>{result.percentage}%</p>
-            <p class="text-xs text-slate-500">Score</p>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 text-sm text-slate-500">
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {result.timeTaken}
-            </span>
-            <span class="text-slate-300">•</span>
-            <span>{result.totalQuestions} questions</span>
-          </div>
-          <a 
-            href={`/dashboard/result/${result.id}`}
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 text-primary-600 text-sm font-semibold hover:bg-primary-100 transition-colors"
-          >
-            View Details
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
+    {results.length === 0 ? (
+      <div class="card p-12 text-center">
+        <p class="text-slate-400">No results yet. Take an exam to see your results here.</p>
       </div>
-    ))}
+    ) : (
+      results.map((result) => (
+        <div class="result-card card p-5" data-status={result.status.toLowerCase()}>
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                result.status === 'Pass' ? 'bg-success-500/10 text-success-500' : 'bg-danger-500/10 text-danger-500'
+              }`}>
+                {result.status === 'Pass' ? (
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ) : (
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <h3 class="font-semibold text-slate-900">{result.examName}</h3>
+                <p class="text-sm text-slate-500">{result.date}</p>
+              </div>
+            </div>
+            <span class={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+              result.status === 'Pass'
+                ? 'bg-success-500/10 text-success-600'
+                : 'bg-danger-500/10 text-danger-600'
+            }`}>
+              {result.status}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="text-center p-3 bg-slate-50 rounded-xl">
+              <p class="text-lg font-bold text-slate-900">{result.obtainedMarks}</p>
+              <p class="text-xs text-slate-500">Obtained</p>
+            </div>
+            <div class="text-center p-3 bg-slate-50 rounded-xl">
+              <p class="text-lg font-bold text-slate-900">{result.totalMarks}</p>
+              <p class="text-xs text-slate-500">Total</p>
+            </div>
+            <div class="text-center p-3 bg-slate-50 rounded-xl">
+              <p class={`text-lg font-bold ${
+                result.percentage >= 70 ? 'text-success-600' : result.percentage >= 50 ? 'text-warning-600' : 'text-danger-600'
+              }`}>{result.percentage}%</p>
+              <p class="text-xs text-slate-500">Score</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm text-slate-500">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {result.timeTaken}
+              </span>
+              <span class="text-slate-300">&bull;</span>
+              <span>{result.totalQuestions} questions</span>
+            </div>
+            <a 
+              href={`/dashboard/result/${result.id}`}
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-50 text-primary-600 text-sm font-semibold hover:bg-primary-100 transition-colors"
+            >
+              View Details
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      ))
+    )}
   </div>
 </StudentLayout>
 

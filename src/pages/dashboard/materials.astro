@@ -4,107 +4,25 @@ import { createClient } from '../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
-const materials = [
-  {
-    title: 'Algebra - Linear Equations',
-    grade: 8,
-    chapter: 'Chapter 3',
-    type: 'Notes',
-    description: 'Complete notes covering linear equations, variables, and solving methods with practice examples.',
-    fileSize: '2.4 MB',
-  },
-  {
-    title: 'Geometry - Triangles MCQ',
-    grade: 7,
-    chapter: 'Chapter 5',
-    type: 'MCQ',
-    description: '50 multiple choice questions on triangle properties, congruence, and similarity.',
-    fileSize: '850 KB',
-  },
-  {
-    title: 'Number Theory PDF',
-    grade: 6,
-    chapter: 'Chapter 1',
-    type: 'PDF',
-    description: 'Comprehensive PDF covering prime numbers, factors, multiples, and divisibility rules.',
-    fileSize: '5.1 MB',
-  },
-  {
-    title: 'Algebra Model Questions',
-    grade: 8,
-    chapter: 'Chapter 3',
-    type: 'Model',
-    description: 'Model exam paper with 100 marks covering algebra fundamentals and advanced problems.',
-    fileSize: '1.2 MB',
-  },
-  {
-    title: 'Fractions & Decimals Notes',
-    grade: 5,
-    chapter: 'Chapter 2',
-    type: 'Notes',
-    description: 'Easy-to-understand notes on fractions, decimals, and their conversions with examples.',
-    fileSize: '1.8 MB',
-  },
-  {
-    title: 'Trigonometry MCQ Bank',
-    grade: 10,
-    chapter: 'Chapter 4',
-    type: 'MCQ',
-    description: '100 MCQs on trigonometric ratios, identities, and applications.',
-    fileSize: '1.1 MB',
-  },
-  {
-    title: 'Statistics & Probability PDF',
-    grade: 9,
-    chapter: 'Chapter 6',
-    type: 'PDF',
-    description: 'Detailed PDF on mean, median, mode, probability, and data representation.',
-    fileSize: '3.7 MB',
-  },
-  {
-    title: 'Geometry Model Exam',
-    grade: 7,
-    chapter: 'Chapter 5',
-    type: 'Model',
-    description: 'Full-length model exam on geometry topics including circles and angles.',
-    fileSize: '980 KB',
-  },
-  {
-    title: 'Arithmetic Operations Notes',
-    grade: 5,
-    chapter: 'Chapter 1',
-    type: 'Notes',
-    description: 'Foundation notes on addition, subtraction, multiplication, and division strategies.',
-    fileSize: '2.0 MB',
-  },
-  {
-    title: 'Quadratic Equations MCQ',
-    grade: 10,
-    chapter: 'Chapter 2',
-    type: 'MCQ',
-    description: 'Test your knowledge on quadratic equations, formulas, and graphical solutions.',
-    fileSize: '720 KB',
-  },
-  {
-    title: 'Mensuration PDF',
-    grade: 9,
-    chapter: 'Chapter 7',
-    type: 'PDF',
-    description: 'Complete PDF on area, volume, and surface area of 2D and 3D shapes.',
-    fileSize: '4.3 MB',
-  },
-  {
-    title: 'Pre-Algebra Model Questions',
-    grade: 6,
-    chapter: 'Chapter 3',
-    type: 'Model',
-    description: 'Practice model paper covering pre-algebra concepts and problem-solving techniques.',
-    fileSize: '1.5 MB',
-  },
-];
+// Fetch study materials for student's grade
+const { data: materialsData } = await supabase
+  .from('study_materials')
+  .select('*')
+  .eq('grade', profile?.grade)
+  .order('created_at', { ascending: false });
+
+const materials = (materialsData || []).map((m, i) => ({
+  title: m.title,
+  grade: m.grade,
+  chapter: m.chapter || 'General',
+  type: m.material_type || 'Notes',
+  description: m.description || '',
+  fileSize: m.file_size || 'N/A',
+  fileUrl: m.file_url || '#',
+}));
 
 const typeBadgeClasses: Record<string, string> = {
   Notes: 'bg-blue-100 text-blue-700 border border-blue-200',
@@ -224,7 +142,7 @@ const typeIconColors: Record<string, string> = {
                   </svg>
                 )}
               </div>
-              <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${typeBadgeClasses[material.type]}`}>
+              <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${typeBadgeClasses[material.type] || 'bg-slate-100 text-slate-600'}`}>
                 {material.type}
               </span>
             </div>
@@ -254,13 +172,13 @@ const typeIconColors: Record<string, string> = {
 
           <!-- Actions -->
           <div class="flex items-center gap-2">
-            <a href={`/materials/STU-${String(i + 1).padStart(2, '0')}.pdf`} download class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors shadow-sm">
+            <a href={material.fileUrl} download class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors shadow-sm">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
               Download
             </a>
-            <a href={`/materials/STU-${String(i + 1).padStart(2, '0')}.pdf`} target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+            <a href={material.fileUrl} target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -274,7 +192,7 @@ const typeIconColors: Record<string, string> = {
   </div>
 
   <!-- Empty State -->
-  <div id="empty-state" class="hidden text-center py-16">
+  <div id="empty-state" class={`${materials.length > 0 ? 'hidden' : ''} text-center py-16`}>
     <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
       <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />

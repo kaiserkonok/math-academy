@@ -4,120 +4,59 @@ import { createClient } from '../../../lib/supabase-server';
 
 const { supabase } = createClient(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
-const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+const { data: profile } = await supabase.from('profiles').select('id, full_name, grade').eq('id', user?.id).single();
 const studentName = profile?.full_name || 'Student';
 
 const { id } = Astro.params;
 
-const results: Record<string, any> = {
-  '1': {
-    examName: 'Algebra - Chapter 5 Test',
-    date: 'September 10, 2026',
-    totalQuestions: 20,
-    correctAnswers: 17,
-    wrongAnswers: 2,
-    skipped: 1,
-    totalMarks: 100,
-    obtainedMarks: 85,
-    percentage: 85,
-    status: 'Pass',
-    timeTaken: '1h 15m',
-    questions: [
-      { id: 1, text: 'Solve for x: 2x + 5 = 15', yourAnswer: 'x = 5', correctAnswer: 'x = 5', marks: 5, status: 'correct' },
-      { id: 2, text: 'Factorize: x² - 9', yourAnswer: '(x+3)(x-3)', correctAnswer: '(x+3)(x-3)', marks: 5, status: 'correct' },
-      { id: 3, text: 'Simplify: (3x²)(2x³)', yourAnswer: '6x⁵', correctAnswer: '6x⁵', marks: 5, status: 'correct' },
-      { id: 4, text: 'Solve the inequality: 3x - 7 > 5', yourAnswer: 'x > 4', correctAnswer: 'x > 4', marks: 5, status: 'correct' },
-      { id: 5, text: 'Find the value of x: log₂(x) = 3', yourAnswer: 'x = 8', correctAnswer: 'x = 8', marks: 5, status: 'correct' },
-      { id: 6, text: 'Simplify: (x² + 2x + 1)/(x + 1)', yourAnswer: 'x + 1', correctAnswer: 'x + 1', marks: 5, status: 'correct' },
-      { id: 7, text: 'Solve: x² - 5x + 6 = 0', yourAnswer: 'x = 2, 3', correctAnswer: 'x = 2, 3', marks: 5, status: 'correct' },
-      { id: 8, text: 'Find the HCF of 24 and 36', yourAnswer: '12', correctAnswer: '12', marks: 5, status: 'correct' },
-      { id: 9, text: 'Simplify: √(49x²)', yourAnswer: '7x', correctAnswer: '7|x|', marks: 5, status: 'wrong' },
-      { id: 10, text: 'Solve: |2x - 3| = 7', yourAnswer: 'x = 5, -2', correctAnswer: 'x = 5, -2', marks: 5, status: 'correct' },
-      { id: 11, text: 'If f(x) = 2x + 1, find f(3)', yourAnswer: '7', correctAnswer: '7', marks: 5, status: 'correct' },
-      { id: 12, text: 'Find the domain of f(x) = 1/(x-2)', yourAnswer: 'x ≠ 2', correctAnswer: 'x ≠ 2', marks: 5, status: 'correct' },
-      { id: 13, text: 'Solve: 2^x = 32', yourAnswer: 'x = 5', correctAnswer: 'x = 5', marks: 5, status: 'correct' },
-      { id: 14, text: 'Simplify: (x³)²', yourAnswer: 'x⁶', correctAnswer: 'x⁶', marks: 5, status: 'correct' },
-      { id: 15, text: 'Find the LCM of 12 and 18', yourAnswer: '36', correctAnswer: '36', marks: 5, status: 'correct' },
-      { id: 16, text: 'Solve: (x/2) + 3 = 7', yourAnswer: 'x = 8', correctAnswer: 'x = 8', marks: 5, status: 'correct' },
-      { id: 17, text: 'Simplify: 2³ × 2⁴', yourAnswer: '2⁷', correctAnswer: '2⁷', marks: 5, status: 'correct' },
-      { id: 18, text: 'If f(x) = x², find f(-3)', yourAnswer: '9', correctAnswer: '9', marks: 5, status: 'correct' },
-      { id: 19, text: 'Solve: √(x) = 5', yourAnswer: 'x = 25', correctAnswer: 'x = 25', marks: 5, status: 'correct' },
-      { id: 20, text: 'Simplify: (x⁴)/(x²)', yourAnswer: 'x²', correctAnswer: 'x²', marks: 5, status: 'correct' }
-    ]
-  },
-  '2': {
-    examName: 'Calculus - Midterm',
-    date: 'September 5, 2026',
-    totalQuestions: 25,
-    correctAnswers: 18,
-    wrongAnswers: 4,
-    skipped: 3,
-    totalMarks: 100,
-    obtainedMarks: 72,
-    percentage: 72,
-    status: 'Pass',
-    timeTaken: '1h 45m',
-    questions: [
-      { id: 1, text: 'Find the derivative of f(x) = x³', yourAnswer: '3x²', correctAnswer: '3x²', marks: 4, status: 'correct' },
-      { id: 2, text: 'Evaluate: lim(x→0) sin(x)/x', yourAnswer: '1', correctAnswer: '1', marks: 4, status: 'correct' },
-      { id: 3, text: 'Find the integral of 2x dx', yourAnswer: 'x² + C', correctAnswer: 'x² + C', marks: 4, status: 'correct' },
-      { id: 4, text: 'Find the derivative of eˣ', yourAnswer: 'eˣ', correctAnswer: 'eˣ', marks: 4, status: 'correct' },
-      { id: 5, text: 'Evaluate: d/dx(ln(x))', yourAnswer: '1/x', correctAnswer: '1/x', marks: 4, status: 'correct' },
-      { id: 6, text: 'Find ∫(3x² + 2x) dx', yourAnswer: 'x³ + x² + C', correctAnswer: 'x³ + x² + C', marks: 4, status: 'correct' },
-      { id: 7, text: 'Find the derivative of sin(x)', yourAnswer: 'cos(x)', correctAnswer: 'cos(x)', marks: 4, status: 'correct' },
-      { id: 8, text: 'Evaluate: lim(x→∞) 1/x', yourAnswer: '0', correctAnswer: '0', marks: 4, status: 'correct' },
-      { id: 9, text: 'Find ∫cos(x) dx', yourAnswer: 'sin(x) + C', correctAnswer: 'sin(x) + C', marks: 4, status: 'correct' },
-      { id: 10, text: 'Find the derivative of tan(x)', yourAnswer: 'sec²(x)', correctAnswer: 'sec²(x)', marks: 4, status: 'correct' },
-      { id: 11, text: 'Evaluate: d/dx(x²eˣ)', yourAnswer: '2xeˣ + x²eˣ', correctAnswer: '2xeˣ + x²eˣ', marks: 4, status: 'correct' },
-      { id: 12, text: 'Find ∫(1/x) dx', yourAnswer: 'ln|x| + C', correctAnswer: 'ln|x| + C', marks: 4, status: 'correct' },
-      { id: 13, text: 'Find the derivative of cos(x)', yourAnswer: '-sin(x)', correctAnswer: '-sin(x)', marks: 4, status: 'correct' },
-      { id: 14, text: 'Evaluate: lim(x→0) (eˣ-1)/x', yourAnswer: '1', correctAnswer: '1', marks: 4, status: 'correct' },
-      { id: 15, text: 'Find ∫eˣ dx', yourAnswer: 'eˣ + C', correctAnswer: 'eˣ + C', marks: 4, status: 'correct' },
-      { id: 16, text: 'Find the derivative of x²sin(x)', yourAnswer: '2xsin(x) + x²cos(x)', correctAnswer: '2xsin(x) + x²cos(x)', marks: 4, status: 'correct' },
-      { id: 17, text: 'Find ∫sec²(x) dx', yourAnswer: 'tan(x) + C', correctAnswer: 'tan(x) + C', marks: 4, status: 'correct' },
-      { id: 18, text: 'Evaluate: d/dx(ln(x²))', yourAnswer: '2/x', correctAnswer: '2/x', marks: 4, status: 'correct' },
-      { id: 19, text: 'Find the derivative of xˣ', yourAnswer: 'xˣ(1+ln(x))', correctAnswer: 'xˣ(1+ln(x))', marks: 4, status: 'correct' },
-      { id: 20, text: 'Evaluate: lim(x→0) (1-cos(x))/x²', yourAnswer: '1/2', correctAnswer: '1/2', marks: 4, status: 'correct' },
-      { id: 21, text: 'Find ∫sin(x)/cos²(x) dx', yourAnswer: 'sec(x) + C', correctAnswer: 'sec(x) + C', marks: 4, status: 'correct' },
-      { id: 22, text: 'Find the derivative of sin⁻¹(x)', yourAnswer: '1/√(1-x²)', correctAnswer: '1/√(1-x²)', marks: 4, status: 'correct' },
-      { id: 23, text: 'Evaluate: ∫₀¹ x² dx', yourAnswer: '1/3', correctAnswer: '1/3', marks: 4, status: 'correct' },
-      { id: 24, text: 'Find the derivative of cos⁻¹(x)', yourAnswer: '-1/√(1-x²)', correctAnswer: '-1/√(1-x²)', marks: 4, status: 'correct' },
-      { id: 25, text: 'Evaluate: ∫₀π sin(x) dx', yourAnswer: '2', correctAnswer: '2', marks: 4, status: 'correct' }
-    ]
-  },
-  '3': {
-    examName: 'Geometry - Quiz 3',
-    date: 'September 1, 2026',
-    totalQuestions: 15,
-    correctAnswers: 7,
-    wrongAnswers: 5,
-    skipped: 3,
-    totalMarks: 50,
-    obtainedMarks: 22,
-    percentage: 44,
-    status: 'Fail',
-    timeTaken: '45m',
-    questions: [
-      { id: 1, text: 'Find the area of a circle with radius 7cm', yourAnswer: '154 cm²', correctAnswer: '154 cm²', marks: 4, status: 'correct' },
-      { id: 2, text: 'Find the perimeter of a square with side 5cm', yourAnswer: '20cm', correctAnswer: '20cm', marks: 3, status: 'correct' },
-      { id: 3, text: 'What is the Pythagorean theorem?', yourAnswer: 'a²+b²=c²', correctAnswer: 'a²+b²=c²', marks: 3, status: 'correct' },
-      { id: 4, text: 'Find the volume of a cube with side 3cm', yourAnswer: '27 cm³', correctAnswer: '27 cm³', marks: 4, status: 'correct' },
-      { id: 5, text: 'Find the area of a triangle with base 10 and height 5', yourAnswer: '25', correctAnswer: '25', marks: 3, status: 'correct' },
-      { id: 6, text: 'What is the sum of angles in a triangle?', yourAnswer: '180°', correctAnswer: '180°', marks: 3, status: 'correct' },
-      { id: 7, text: 'Find the circumference of a circle with diameter 10cm', yourAnswer: '31.4 cm', correctAnswer: '31.4 cm', marks: 4, status: 'correct' },
-      { id: 8, text: 'Find the area of a rectangle with length 8 and width 3', yourAnswer: '20', correctAnswer: '24', marks: 3, status: 'wrong' },
-      { id: 9, text: 'What is the formula for the area of a trapezoid?', yourAnswer: '½(a+b)h', correctAnswer: '½(a+b)h', marks: 3, status: 'correct' },
-      { id: 10, text: 'Find the volume of a cylinder with r=3, h=10', yourAnswer: '90π', correctAnswer: '90π', marks: 4, status: 'correct' },
-      { id: 11, text: 'Find the diagonal of a square with side 5', yourAnswer: '5√2', correctAnswer: '5√2', marks: 3, status: 'correct' },
-      { id: 12, text: 'What is the formula for the surface area of a sphere?', yourAnswer: '4πr²', correctAnswer: '4πr²', marks: 3, status: 'correct' },
-      { id: 13, text: 'Find the area of a parallelogram with base 6 and height 4', yourAnswer: '20', correctAnswer: '24', marks: 3, status: 'wrong' },
-      { id: 14, text: 'Find the volume of a cone with r=3, h=9', yourAnswer: '27π', correctAnswer: '27π', marks: 4, status: 'correct' },
-      { id: 15, text: 'What is the formula for the area of a regular hexagon?', yourAnswer: '(3√3/2)s²', correctAnswer: '(3√3/2)s²', marks: 4, status: 'correct' }
-    ]
-  }
-};
+// Fetch the exam attempt with exam title
+const { data: attempt, error: attemptError } = await supabase
+  .from('exam_attempts')
+  .select('*, exams!inner(title)')
+  .eq('id', id)
+  .eq('student_id', profile?.id)
+  .single();
 
-const result = results[id] || results['1'];
+if (attemptError || !attempt) {
+  return Astro.redirect('/dashboard/results');
+}
+
+// Fetch student answers with question details
+const { data: answersData } = await supabase
+  .from('student_answers')
+  .select('*, questions!inner(question_text, correct_answer, marks, question_order)')
+  .eq('attempt_id', id);
+
+const sortedAnswers = (answersData || []).sort(
+  (a, b) => (a.questions?.question_order || 0) - (b.questions?.question_order || 0)
+);
+
+const result = {
+  examName: attempt.exams?.title || 'Unknown Exam',
+  date: attempt.submitted_at ? new Date(attempt.submitted_at).toLocaleDateString('en-BD', { month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A',
+  totalQuestions: (attempt.total_correct || 0) + (attempt.total_wrong || 0) + (attempt.total_skipped || 0),
+  correctAnswers: attempt.total_correct || 0,
+  wrongAnswers: attempt.total_wrong || 0,
+  skipped: attempt.total_skipped || 0,
+  totalMarks: attempt.total_marks || 0,
+  obtainedMarks: attempt.obtained_marks || 0,
+  percentage: attempt.percentage || 0,
+  status: attempt.is_passed ? 'Pass' : 'Fail',
+  timeTaken: (() => {
+    const s = attempt.time_taken_seconds || 0;
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  })(),
+  questions: sortedAnswers.map((a, i) => ({
+    id: i + 1,
+    text: a.questions?.question_text || '',
+    yourAnswer: a.selected_answer || 'Skipped',
+    correctAnswer: a.questions?.correct_answer || '',
+    marks: a.questions?.marks || 0,
+    status: a.is_correct ? 'correct' : 'wrong',
+  })),
+};
 
 const circumference = 2 * Math.PI * 45;
 const dashOffset = circumference - (result.percentage / 100) * circumference;
@@ -302,60 +241,64 @@ if (result.percentage >= 70) {
           <p class="text-sm text-slate-500 mt-1">Review your answers for each question</p>
         </div>
         <div class="p-5 space-y-4">
-          {result.questions.map((q: any) => (
-            <div class={`p-5 rounded-xl border-2 transition-all ${
-              q.status === 'correct' 
-                ? 'border-success-500/20 bg-success-500/5' 
-                : 'border-danger-500/20 bg-danger-500/5'
-            }`}>
-              <div class="flex items-start gap-4">
-                <div class={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  q.status === 'correct' 
-                    ? 'bg-success-500 text-white' 
-                    : 'bg-danger-500 text-white'
-                }`}>
-                  {q.status === 'correct' ? (
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-start justify-between gap-4 mb-3">
-                    <h3 class="font-medium text-slate-900">
-                      <span class="text-slate-400 mr-2">Q{q.id}.</span>
-                      {q.text}
-                    </h3>
-                    <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold flex-shrink-0 ${
-                      q.status === 'correct' 
-                        ? 'bg-success-500/10 text-success-600' 
-                        : 'bg-danger-500/10 text-danger-600'
-                    }`}>
-                      {q.marks} marks
-                    </span>
+          {result.questions.length === 0 ? (
+            <p class="text-center text-slate-400 py-8">No answer data available for this attempt.</p>
+          ) : (
+            result.questions.map((q: any) => (
+              <div class={`p-5 rounded-xl border-2 transition-all ${
+                q.status === 'correct' 
+                  ? 'border-success-500/20 bg-success-500/5' 
+                  : 'border-danger-500/20 bg-danger-500/5'
+              }`}>
+                <div class="flex items-start gap-4">
+                  <div class={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    q.status === 'correct' 
+                      ? 'bg-success-500 text-white' 
+                      : 'bg-danger-500 text-white'
+                  }`}>
+                    {q.status === 'correct' ? (
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
                   </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class={`p-3 rounded-lg ${
-                      q.status === 'correct' ? 'bg-success-500/10' : 'bg-danger-500/10'
-                    }`}>
-                      <p class="text-xs text-slate-500 mb-1">Your Answer</p>
-                      <p class={`font-semibold ${
-                        q.status === 'correct' ? 'text-success-700' : 'text-danger-700'
-                      }`}>{q.yourAnswer}</p>
+                  <div class="flex-1">
+                    <div class="flex items-start justify-between gap-4 mb-3">
+                      <h3 class="font-medium text-slate-900">
+                        <span class="text-slate-400 mr-2">Q{q.id}.</span>
+                        {q.text}
+                      </h3>
+                      <span class={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold flex-shrink-0 ${
+                        q.status === 'correct' 
+                          ? 'bg-success-500/10 text-success-600' 
+                          : 'bg-danger-500/10 text-danger-600'
+                      }`}>
+                        {q.marks} marks
+                      </span>
                     </div>
-                    <div class="p-3 rounded-lg bg-slate-100">
-                      <p class="text-xs text-slate-500 mb-1">Correct Answer</p>
-                      <p class="font-semibold text-slate-700">{q.correctAnswer}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div class={`p-3 rounded-lg ${
+                        q.status === 'correct' ? 'bg-success-500/10' : 'bg-danger-500/10'
+                      }`}>
+                        <p class="text-xs text-slate-500 mb-1">Your Answer</p>
+                        <p class={`font-semibold ${
+                          q.status === 'correct' ? 'text-success-700' : 'text-danger-700'
+                        }`}>{q.yourAnswer}</p>
+                      </div>
+                      <div class="p-3 rounded-lg bg-slate-100">
+                        <p class="text-xs text-slate-500 mb-1">Correct Answer</p>
+                        <p class="font-semibold text-slate-700">{q.correctAnswer}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
