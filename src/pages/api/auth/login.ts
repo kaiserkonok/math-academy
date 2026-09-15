@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { createClient } from '../../../lib/supabase-server';
+import { createClient, cookieSetCookieHeaders } from '../../../lib/supabase-server';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   let body: { email?: string; password?: string };
@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   try {
-    const supabase = createClient(request, cookies);
+    const { supabase, pendingSet } = createClient(request, cookies);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       return Response.json({ error: error.message }, { status: 401 });
@@ -44,7 +44,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    return Response.json({ redirect: profile.role === 'admin' ? '/admin/' : '/dashboard/' });
+    const headers = new Headers({ 'Content-Type': 'application/json' });
+    for (const sc of cookieSetCookieHeaders(pendingSet)) {
+      headers.append('Set-Cookie', sc);
+    }
+
+    return new Response(
+      JSON.stringify({ redirect: profile.role === 'admin' ? '/admin/' : '/dashboard/' }),
+      { status: 200, headers }
+    );
   } catch (err) {
     console.error('[login] failed:', err);
     return Response.json({ error: 'Login failed. Please try again.' }, { status: 500 });

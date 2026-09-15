@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { createClient } from '../../../lib/supabase-server';
+import { createClient, cookieSetCookieHeaders } from '../../../lib/supabase-server';
 
 interface SignupBody {
   fullName?: string;
@@ -43,7 +43,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   try {
-    const supabase = createClient(request, cookies);
+    const { supabase, pendingSet } = createClient(request, cookies);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -64,16 +64,27 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return Response.json({ error: 'Could not create account. Please try again.' }, { status: 500 });
     }
 
+    const headers = new Headers({ 'Content-Type': 'application/json' });
+    for (const sc of cookieSetCookieHeaders(pendingSet)) {
+      headers.append('Set-Cookie', sc);
+    }
+
     if (data.session) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('student_id')
         .eq('id', data.user.id)
         .single();
-      return Response.json({ redirect: '/dashboard/', studentId: profile?.student_id ?? null });
+      return new Response(
+        JSON.stringify({ redirect: '/dashboard/', studentId: profile?.student_id ?? null }),
+        { status: 200, headers }
+      );
     }
 
-    return Response.json({ needsConfirmation: true });
+    return new Response(
+      JSON.stringify({ needsConfirmation: true }),
+      { status: 200, headers }
+    );
   } catch (err) {
     console.error('[signup] failed:', err);
     return Response.json({ error: 'Registration failed. Please try again.' }, { status: 500 });
