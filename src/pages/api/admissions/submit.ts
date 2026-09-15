@@ -57,8 +57,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const supabase = createClient(cookies);
 
-    // Resolve the human-readable batch to a batches.id (admin assigns it
-    // later if no match exists yet).
+    // Resolve the human-readable batch to a batches.id.
+    // If no match, try to find any batch for that grade as fallback.
     let batchId: number | null = null;
     const { data: match } = await supabase
       .from('batches')
@@ -67,7 +67,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       .ilike('name', `%${batch}%`)
       .limit(1)
       .maybeSingle();
-    if (match) batchId = match.id;
+    if (match) {
+      batchId = match.id;
+    } else {
+      // Fallback: find the first batch for this grade
+      const { data: fallback } = await supabase
+        .from('batches')
+        .select('id')
+        .eq('grade', grade)
+        .order('id')
+        .limit(1)
+        .maybeSingle();
+      if (fallback) batchId = fallback.id;
+    }
 
     const { error } = await supabase.from('admissions').insert({
       student_name: studentName,
