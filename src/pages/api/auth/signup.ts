@@ -10,6 +10,7 @@ interface SignupBody {
   batch?: string;
   password?: string;
   parentName?: string;
+  parentPhone?: string;
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -27,6 +28,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const batch = body.batch?.trim() || '';
   const password = body.password || '';
   const parentName = body.parentName?.trim() || '';
+  const parentPhone = body.parentPhone?.trim() || '';
 
   if (!fullName || !email || !password || !Number.isInteger(grade) || grade < 5 || grade > 10 || !batch) {
     return Response.json({ error: 'Please fill in all required fields correctly.' }, { status: 400 });
@@ -34,7 +36,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (password.length < 6) {
     return Response.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
   }
-  if (fullName.length > 100 || email.length > 254 || phone.length > 20 || parentName.length > 100 || password.length > 128) {
+  if (fullName.length > 100 || email.length > 254 || phone.length > 20 || parentName.length > 100 || parentPhone.length > 20 || password.length > 128) {
     return Response.json({ error: 'Input too long.' }, { status: 400 });
   }
 
@@ -62,6 +64,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           grade: String(grade),
           batch,
           parent_name: parentName,
+          parent_phone: parentPhone,
         },
       },
     });

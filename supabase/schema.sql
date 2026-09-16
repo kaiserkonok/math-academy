@@ -408,7 +408,7 @@ BEGIN
     new_sid := 'MATH-' || EXTRACT(YEAR FROM NOW())::TEXT || '-'
       || LPAD((floor(random() * 9000) + 1000)::INT::TEXT, 4, '0');
     BEGIN
-      INSERT INTO public.profiles (id, full_name, student_id, grade, batch, phone, parent_name, role, is_active)
+      INSERT INTO public.profiles (id, full_name, student_id, grade, batch, phone, parent_name, parent_phone, role, is_active)
       VALUES (
         NEW.id,
         COALESCE(NULLIF(NEW.raw_user_meta_data->>'full_name', ''), 'Student'),
@@ -417,6 +417,7 @@ BEGIN
         NULLIF(NEW.raw_user_meta_data->>'batch', ''),
         NULLIF(NEW.raw_user_meta_data->>'phone', ''),
         NULLIF(NEW.raw_user_meta_data->>'parent_name', ''),
+        NULLIF(NEW.raw_user_meta_data->>'parent_phone', ''),
         'student',
         TRUE
       );
