@@ -1,20 +1,20 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { createClient } from '../../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
-const gallery = [
-  { id: 'PHY-001', caption: 'Advanced Algebra Class Session', category: 'Classroom', date: '2026-09-12', gradient: 'from-blue-500 to-purple-600', icon: '📐' },
-  { id: 'PHY-002', caption: 'Annual Math Olympiad 2026 Ceremony', category: 'Events', date: '2026-09-10', gradient: 'from-amber-500 to-orange-600', icon: '🏆' },
-  { id: 'PHY-003', caption: 'SSC Preparation Group Study', category: 'Students', date: '2026-09-08', gradient: 'from-emerald-500 to-teal-600', icon: '👥' },
-  { id: 'PHY-004', caption: 'Modern Classroom with Smart Board', category: 'Facilities', date: '2026-09-05', gradient: 'from-indigo-500 to-blue-600', icon: '🏫' },
-  { id: 'PHY-005', caption: 'Geometry Workshop for Class 9-10', category: 'Classroom', date: '2026-09-03', gradient: 'from-rose-500 to-pink-600', icon: '📊' },
-  { id: 'PHY-006', caption: 'Science Fair Mathematics Section', category: 'Events', date: '2026-08-28', gradient: 'from-violet-500 to-purple-600', icon: '🎪' },
-  { id: 'PHY-007', caption: 'HSC Candidates Coaching Session', category: 'Students', date: '2026-08-25', gradient: 'from-cyan-500 to-blue-600', icon: '📚' },
-  { id: 'PHY-008', caption: 'Library & Study Hall', category: 'Facilities', date: '2026-08-20', gradient: 'from-green-500 to-emerald-600', icon: '📖' },
-  { id: 'PHY-009', caption: 'Trigonometry Masterclass', category: 'Classroom', date: '2026-08-18', gradient: 'from-red-500 to-rose-600', icon: '📏' },
-  { id: 'PHY-010', caption: 'Student Award Distribution Day', category: 'Events', date: '2026-08-15', gradient: 'from-yellow-500 to-amber-600', icon: '🥇' },
-  { id: 'PHY-011', caption: 'Mathematics Lab & Equipment', category: 'Facilities', date: '2026-08-12', gradient: 'from-slate-500 to-gray-600', icon: '🔬' },
-  { id: 'PHY-012', caption: 'Creative Problem Solving Workshop', category: 'Students', date: '2026-08-10', gradient: 'from-teal-500 to-cyan-600', icon: '💡' },
-];
+const { data: galleryData } = await supabase
+  .from('gallery')
+  .select('*')
+  .order('uploaded_at', { ascending: false });
+
+const gallery = (galleryData || []).map(g => ({
+  id: `PHY-${String(g.id).padStart(3, '0')}`,
+  caption: g.caption || 'Untitled',
+  category: g.category || 'Uncategorized',
+  date: g.uploaded_at ? new Date(g.uploaded_at).toISOString().split('T')[0] : 'N/A',
+  gradient: 'from-blue-500 to-purple-600',
+}));
 
 const classroomCount = gallery.filter(p => p.category === 'Classroom').length;
 const eventsCount = gallery.filter(p => p.category === 'Events').length;
@@ -30,7 +30,6 @@ const categoryColors: Record<string, string> = {
 ---
 
 <AdminLayout title="Gallery Management">
-  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Gallery Management</h1>
@@ -47,7 +46,6 @@ const categoryColors: Record<string, string> = {
     </button>
   </div>
 
-  <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-4">
@@ -116,41 +114,40 @@ const categoryColors: Record<string, string> = {
     </div>
   </div>
 
-  <!-- Category Filter -->
   <div class="mb-6">
     <div class="flex flex-wrap gap-2" id="categoryFilters">
       <button onclick="filterCategory('')" class="category-btn active px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-primary-600 text-white shadow-md shadow-primary-600/25" data-category="">
         All Photos
       </button>
       <button onclick="filterCategory('Classroom')" class="category-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-600" data-category="Classroom">
-        🏫 Classroom
+        Classroom
       </button>
       <button onclick="filterCategory('Events')" class="category-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-600 border border-slate-200 hover:border-amber-300 hover:text-amber-600" data-category="Events">
-        🎉 Events
+        Events
       </button>
       <button onclick="filterCategory('Students')" class="category-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:text-emerald-600" data-category="Students">
-        👥 Students
+        Students
       </button>
       <button onclick="filterCategory('Facilities')" class="category-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-600 border border-slate-200 hover:border-indigo-300 hover:text-indigo-600" data-category="Facilities">
-        🏢 Facilities
+        Facilities
       </button>
     </div>
   </div>
 
-  <!-- Photo Grid -->
+  {gallery.length === 0 ? (
+    <div class="text-center py-16 card">
+      <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <p class="text-slate-500 font-medium">No photos found</p>
+      <p class="text-sm text-slate-400 mt-1">Upload photos to build your gallery.</p>
+    </div>
+  ) : (
   <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     {gallery.map((photo) => (
       <div class="group card overflow-hidden hover:shadow-xl transition-all duration-300 photo-card" data-category={photo.category}>
-        <!-- Image Placeholder -->
         <div class={`relative h-52 bg-gradient-to-br ${photo.gradient} flex items-center justify-center overflow-hidden`}>
-          <span class="text-6xl opacity-60 group-hover:scale-110 transition-transform duration-300">{photo.icon}</span>
-          <!-- Overlay Actions -->
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
-            <button onclick={`editPhoto('${photo.id}', '${photo.caption.replace(/'/g, "\\'")}', '${photo.category}')`} class="p-3 bg-white/90 rounded-xl hover:bg-white transition-colors shadow-lg">
-              <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
             <button onclick={`deletePhoto('${photo.id}')`} class="p-3 bg-white/90 rounded-xl hover:bg-red-50 transition-colors shadow-lg">
               <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -158,8 +155,6 @@ const categoryColors: Record<string, string> = {
             </button>
           </div>
         </div>
-
-        <!-- Photo Info -->
         <div class="p-4">
           <p class="font-semibold text-slate-900 text-sm leading-snug mb-2 line-clamp-2">{photo.caption}</p>
           <div class="flex items-center justify-between">
@@ -172,42 +167,14 @@ const categoryColors: Record<string, string> = {
       </div>
     ))}
   </div>
+  )}
 
-  <!-- Empty State (hidden by default) -->
-  <div id="emptyState" class="hidden text-center py-16">
-    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-100 flex items-center justify-center">
-      <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    </div>
-    <h3 class="text-lg font-semibold text-slate-900 mb-2">No photos found</h3>
-    <p class="text-slate-500 mb-6">No photos match the selected category.</p>
-    <button onclick="filterCategory('')" class="px-5 py-2.5 text-sm font-medium text-primary-600 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors">
-      View All Photos
-    </button>
-  </div>
-
-  <!-- Pagination -->
   <div class="mt-6 card p-5">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700" id="showingCount">1-{gallery.length}</span> of <span class="font-semibold text-slate-700">{gallery.length}</span> photos</p>
-      <div class="flex items-center gap-1">
-        <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
-        <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- Upload/Edit Photo Modal -->
   <div id="photoModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg mx-4">
@@ -223,47 +190,10 @@ const categoryColors: Record<string, string> = {
         <form id="photoForm" onsubmit="handleSubmit(event)" class="p-6 space-y-5">
           <input type="hidden" id="formAction" value="add" />
           <input type="hidden" id="editPhotoId" value="" />
-
-          <!-- Image Upload Drag & Drop -->
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Photo</label>
-            <div
-              id="dropZone"
-              class="relative border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-primary-400 transition-colors cursor-pointer"
-              ondragover="event.preventDefault(); this.classList.add('border-primary-400', 'bg-primary-50')"
-              ondragleave="this.classList.remove('border-primary-400', 'bg-primary-50')"
-              ondrop="event.preventDefault(); this.classList.remove('border-primary-400', 'bg-primary-50'); handleFileDrop(event)"
-              onclick="document.getElementById('photoFile').click()"
-            >
-              <input type="file" id="photoFile" accept="image/*" class="hidden" onchange="handleFileSelect(event)" />
-              <div id="uploadPlaceholder">
-                <svg class="w-12 h-12 mx-auto text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <p class="text-sm text-slate-600 font-medium">Drag & drop an image here, or click to browse</p>
-                <p class="text-xs text-slate-400 mt-1">PNG, JPG, GIF up to 5MB</p>
-              </div>
-              <div id="imagePreview" class="hidden">
-                <div class="relative inline-block">
-                  <img id="previewImg" src="" alt="Preview" class="max-h-40 rounded-lg mx-auto" />
-                  <button type="button" onclick="event.stopPropagation(); removeImage()" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <p id="fileName" class="text-sm text-slate-600 mt-2 font-medium"></p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Caption -->
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Caption</label>
             <input type="text" id="photoCaption" required class="input-field" placeholder="e.g. Advanced Algebra Class Session" />
           </div>
-
-          <!-- Category -->
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Category</label>
             <select id="photoCategory" required class="input-field">
@@ -274,8 +204,6 @@ const categoryColors: Record<string, string> = {
               <option value="Facilities">Facilities</option>
             </select>
           </div>
-
-          <!-- Actions -->
           <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
               Cancel
@@ -306,30 +234,12 @@ const categoryColors: Record<string, string> = {
   </style>
 
   <script is:inline>
-    const gallery = [
-      { id: 'PHY-001', caption: 'Advanced Algebra Class Session', category: 'Classroom', date: '2026-09-12' },
-      { id: 'PHY-002', caption: 'Annual Math Olympiad 2026 Ceremony', category: 'Events', date: '2026-09-10' },
-      { id: 'PHY-003', caption: 'SSC Preparation Group Study', category: 'Students', date: '2026-09-08' },
-      { id: 'PHY-004', caption: 'Modern Classroom with Smart Board', category: 'Facilities', date: '2026-09-05' },
-      { id: 'PHY-005', caption: 'Geometry Workshop for Class 9-10', category: 'Classroom', date: '2026-09-03' },
-      { id: 'PHY-006', caption: 'Science Fair Mathematics Section', category: 'Events', date: '2026-08-28' },
-      { id: 'PHY-007', caption: 'HSC Candidates Coaching Session', category: 'Students', date: '2026-08-25' },
-      { id: 'PHY-008', caption: 'Library & Study Hall', category: 'Facilities', date: '2026-08-20' },
-      { id: 'PHY-009', caption: 'Trigonometry Masterclass', category: 'Classroom', date: '2026-08-18' },
-      { id: 'PHY-010', caption: 'Student Award Distribution Day', category: 'Events', date: '2026-08-15' },
-      { id: 'PHY-011', caption: 'Mathematics Lab & Equipment', category: 'Facilities', date: '2026-08-12' },
-      { id: 'PHY-012', caption: 'Creative Problem Solving Workshop', category: 'Students', date: '2026-08-10' },
-    ];
-
-    let currentFilter = '';
-
     function openModal() {
       document.getElementById('formAction').value = 'add';
       document.getElementById('editPhotoId').value = '';
       document.getElementById('modalTitle').textContent = 'Upload New Photo';
       document.getElementById('submitBtnText').textContent = 'Upload Photo';
       document.getElementById('photoForm').reset();
-      removeImage();
       document.getElementById('photoModal').classList.remove('hidden');
     }
 
@@ -337,57 +247,10 @@ const categoryColors: Record<string, string> = {
       document.getElementById('photoModal').classList.add('hidden');
     }
 
-    function editPhoto(id, caption, category) {
-      document.getElementById('formAction').value = 'edit';
-      document.getElementById('editPhotoId').value = id;
-      document.getElementById('modalTitle').textContent = 'Edit Photo';
-      document.getElementById('submitBtnText').textContent = 'Save Changes';
-      document.getElementById('photoCaption').value = caption;
-      document.getElementById('photoCategory').value = category;
-      document.getElementById('photoModal').classList.remove('hidden');
-    }
-
     function deletePhoto(id) {
       if (confirm('Are you sure you want to delete this photo?')) {
         alert('Photo deleted successfully!');
       }
-    }
-
-    function handleFileSelect(event) {
-      const input = event.target;
-      if (input.files && input.files.length > 0) {
-        showPreview(input.files[0]);
-      }
-    }
-
-    function handleFileDrop(event) {
-      const files = event.dataTransfer?.files;
-      if (files && files.length > 0) {
-        const file = files[0];
-        if (file.type.startsWith('image/')) {
-          document.getElementById('photoFile').files = files;
-          showPreview(file);
-        }
-      }
-    }
-
-    function showPreview(file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const previewImg = document.getElementById('previewImg');
-        previewImg.src = e.target?.result;
-        document.getElementById('fileName').textContent = file.name;
-        document.getElementById('uploadPlaceholder').classList.add('hidden');
-        document.getElementById('imagePreview').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeImage() {
-      const input = document.getElementById('photoFile');
-      input.value = '';
-      document.getElementById('uploadPlaceholder').classList.remove('hidden');
-      document.getElementById('imagePreview').classList.add('hidden');
     }
 
     function handleSubmit(e) {
@@ -402,7 +265,6 @@ const categoryColors: Record<string, string> = {
     }
 
     function filterCategory(category) {
-      currentFilter = category;
       const cards = document.querySelectorAll('.photo-card');
       let visibleCount = 0;
 
@@ -414,7 +276,6 @@ const categoryColors: Record<string, string> = {
         if (show) visibleCount++;
       });
 
-      // Update active button styles
       document.querySelectorAll('.category-btn').forEach(btn => {
         const el = btn;
         const btnCategory = el.dataset.category;
@@ -427,22 +288,7 @@ const categoryColors: Record<string, string> = {
         }
       });
 
-      // Update showing count
       document.getElementById('showingCount').textContent = `1-${visibleCount}`;
-
-      // Show/hide empty state
-      const emptyState = document.getElementById('emptyState');
-      const photoGrid = document.getElementById('photoGrid');
-      const pagination = document.querySelector('.mt-6.card');
-      if (visibleCount === 0) {
-        emptyState.classList.remove('hidden');
-        photoGrid.classList.add('hidden');
-        pagination.classList.add('hidden');
-      } else {
-        emptyState.classList.add('hidden');
-        photoGrid.classList.remove('hidden');
-        pagination.classList.remove('hidden');
-      }
     }
   </script>
 </AdminLayout>

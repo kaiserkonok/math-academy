@@ -1,22 +1,35 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
-const students = [
-  { id: 'STU-2024-001', name: 'Tanvir Hossain', grade: 10, batch: 'Morning', phone: '01712-345678', status: 'active', avatar: '' },
-  { id: 'STU-2024-002', name: 'Fatema Khatun', grade: 9, batch: 'Afternoon', phone: '01813-456789', status: 'active', avatar: '' },
-  { id: 'STU-2024-003', name: 'Rakibul Hasan', grade: 10, batch: 'Morning', phone: '01914-567890', status: 'active', avatar: '' },
-  { id: 'STU-2024-004', name: 'Nusrat Jahan', grade: 8, batch: 'Evening', phone: '01615-678901', status: 'inactive', avatar: '' },
-  { id: 'STU-2024-005', name: 'Imran Hossain', grade: 9, batch: 'Afternoon', phone: '01716-789012', status: 'active', avatar: '' },
-  { id: 'STU-2024-006', name: 'Sumaiya Akter', grade: 10, batch: 'Morning', phone: '01817-890123', status: 'active', avatar: '' },
-  { id: 'STU-2024-007', name: 'Arif Rahman', grade: 8, batch: 'Evening', phone: '01918-901234', status: 'active', avatar: '' },
-  { id: 'STU-2024-008', name: 'Tamanna Begum', grade: 9, batch: 'Afternoon', phone: '01619-012345', status: 'inactive', avatar: '' },
-  { id: 'STU-2024-009', name: 'Sakib Al Hasan', grade: 10, batch: 'Morning', phone: '01720-123456', status: 'active', avatar: '' },
-  { id: 'STU-2024-010', name: 'Mst. Rabeya Khatun', grade: 9, batch: 'Evening', phone: '01821-234567', status: 'active', avatar: '' },
-];
+const { data: studentsData } = await supabase
+  .from('profiles')
+  .select('id, full_name, student_id, grade, batch, phone, is_active, avatar_url')
+  .eq('role', 'student')
+  .order('created_at', { ascending: false });
+
+const students = (studentsData || []).map(s => ({
+  id: s.student_id || s.id?.slice(0, 8) || 'N/A',
+  name: s.full_name || 'Unknown',
+  grade: s.grade || 0,
+  batch: s.batch || 'N/A',
+  phone: s.phone || 'N/A',
+  status: s.is_active ? 'active' : 'inactive',
+  avatar: s.avatar_url || '',
+}));
+
+const totalStudents = students.length;
+const activeCount = students.filter(s => s.status === 'active').length;
+const inactiveCount = students.filter(s => s.status === 'inactive').length;
+const newThisMonth = students.filter(s => {
+  const d = new Date(s.id);
+  const now = new Date();
+  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}).length;
 ---
 
 <AdminLayout title="Student Management">
-  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Student Management</h1>
@@ -33,7 +46,6 @@ const students = [
     </button>
   </div>
 
-  <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-4">
@@ -44,7 +56,7 @@ const students = [
         </div>
         <div>
           <p class="text-sm text-slate-500">Total Students</p>
-          <p class="text-2xl font-bold text-slate-900">248</p>
+          <p class="text-2xl font-bold text-slate-900">{totalStudents}</p>
         </div>
       </div>
     </div>
@@ -57,7 +69,7 @@ const students = [
         </div>
         <div>
           <p class="text-sm text-slate-500">Active</p>
-          <p class="text-2xl font-bold text-slate-900">215</p>
+          <p class="text-2xl font-bold text-slate-900">{activeCount}</p>
         </div>
       </div>
     </div>
@@ -70,7 +82,7 @@ const students = [
         </div>
         <div>
           <p class="text-sm text-slate-500">Inactive</p>
-          <p class="text-2xl font-bold text-slate-900">33</p>
+          <p class="text-2xl font-bold text-slate-900">{inactiveCount}</p>
         </div>
       </div>
     </div>
@@ -83,13 +95,12 @@ const students = [
         </div>
         <div>
           <p class="text-sm text-slate-500">New This Month</p>
-          <p class="text-2xl font-bold text-slate-900">18</p>
+          <p class="text-2xl font-bold text-slate-900">{newThisMonth}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Search & Filters -->
   <div class="card p-5 mb-6">
     <div class="flex flex-col lg:flex-row gap-4">
       <div class="flex-1 relative">
@@ -129,7 +140,6 @@ const students = [
     </div>
   </div>
 
-  <!-- Bulk Actions -->
   <div id="bulkActions" class="hidden card p-4 mb-6 bg-primary-50 border-primary-200">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -149,8 +159,16 @@ const students = [
     </div>
   </div>
 
-  <!-- Students Table -->
   <div class="card overflow-hidden mb-6">
+    {students.length === 0 ? (
+      <div class="text-center py-16">
+        <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <p class="text-slate-500 font-medium">No students found</p>
+        <p class="text-sm text-slate-400 mt-1">Students will appear here once registered.</p>
+      </div>
+    ) : (
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -227,31 +245,13 @@ const students = [
         </tbody>
       </table>
     </div>
+    )}
   </div>
 
-  <!-- Pagination -->
   <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-    <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-10</span> of <span class="font-semibold text-slate-700">248</span> students</p>
-    <div class="flex items-center gap-1">
-      <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">2</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">3</button>
-      <span class="px-2 text-slate-400">...</span>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">25</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
+    <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-{totalStudents}</span> of <span class="font-semibold text-slate-700">{totalStudents}</span> students</p>
   </div>
 
-  <!-- Add/Edit Student Modal -->
   <div id="studentModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg mx-4">

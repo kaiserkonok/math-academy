@@ -1,5 +1,7 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
 const today = new Date().toLocaleDateString('en-BD', {
   weekday: 'long',
@@ -8,51 +10,70 @@ const today = new Date().toLocaleDateString('en-BD', {
   day: 'numeric',
 });
 
-const stats = [
-  { label: 'Total Students', value: '1,247', icon: 'users', color: 'primary', change: '+12%', changeType: 'up' },
-  { label: 'Active Exams', value: '8', icon: 'clipboard', color: 'secondary', change: '+2', changeType: 'up' },
-  { label: 'Total Results', value: '3,891', icon: 'chart', color: 'success', change: '156 today', changeType: 'up' },
-  { label: 'Pending Admissions', value: '24', icon: 'user-plus', color: 'warning', change: '-3', changeType: 'down' },
-  { label: 'Published Notices', value: '42', icon: 'bell', color: 'info', change: '2 new', changeType: 'up' },
-  { label: 'Study Materials', value: '186', icon: 'book', color: 'purple', change: '8 new', changeType: 'up' },
-];
+const [studentsResult, examsResult, admissionsResult, attemptsResult, noticesResult, materialsResult] = await Promise.all([
+  supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
+  supabase.from('exams').select('id', { count: 'exact', head: true }).eq('is_published', true),
+  supabase.from('admissions').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+  supabase.from('exam_attempts').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+  supabase.from('notices').select('id', { count: 'exact', head: true }),
+  supabase.from('study_materials').select('id', { count: 'exact', head: true }),
+]);
+
+const totalStudents = studentsResult.count || 0;
+const activeExams = examsResult.count || 0;
+const pendingAdmissions = admissionsResult.count || 0;
+const totalResults = attemptsResult.count || 0;
+const publishedNotices = noticesResult.count || 0;
+const studyMaterials = materialsResult.count || 0;
+
+const { data: recentAttempts } = await supabase
+  .from('exam_attempts')
+  .select('id, submitted_at, profiles!inner(full_name), exams!inner(title)')
+  .eq('status', 'completed')
+  .order('submitted_at', { ascending: false })
+  .limit(3);
+
+const { data: recentAdmissionsData } = await supabase
+  .from('admissions')
+  .select('id, student_name, grade, status, applied_at')
+  .order('applied_at', { ascending: false })
+  .limit(5);
 
 const recentActivity = [
-  { type: 'admission', text: 'New student admitted — Fatima Rahman (Grade 10)', time: '15 min ago', icon: 'user-plus', color: 'success' },
-  { type: 'exam', text: 'Algebra Final Exam submitted by 45 students', time: '1 hour ago', icon: 'clipboard', color: 'primary' },
-  { type: 'result', text: 'Midterm results published for Grade 9', time: '2 hours ago', icon: 'chart', color: 'secondary' },
-  { type: 'admission', text: 'New student admitted — Karim Hossain (Grade 8)', time: '3 hours ago', icon: 'user-plus', color: 'success' },
-  { type: 'exam', text: 'Geometry Quiz completed — 38 submissions', time: '5 hours ago', icon: 'clipboard', color: 'primary' },
-  { type: 'result', text: 'Chapter 5 Test results published for Grade 10', time: '6 hours ago', icon: 'chart', color: 'secondary' },
-];
+  ...(recentAttempts || []).map(a => ({
+    type: 'exam',
+    text: `${(a.exams as any)?.title || 'Exam'} submitted by ${(a.profiles as any)?.full_name || 'student'}`,
+    time: a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : '',
+    icon: 'clipboard',
+    color: 'primary',
+  })),
+  ...(recentAdmissionsData || []).map(a => ({
+    type: 'admission',
+    text: `New student admitted — ${a.student_name || 'Unknown'} (Grade ${a.grade || '?'})`,
+    time: a.applied_at ? new Date(a.applied_at).toLocaleDateString() : '',
+    icon: 'user-plus',
+    color: 'success',
+  })),
+].slice(0, 6);
+
+const recentAdmissions = (recentAdmissionsData || []).map(a => ({
+  name: a.student_name || 'Unknown',
+  grade: String(a.grade || '?'),
+  date: a.applied_at ? new Date(a.applied_at).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+  status: a.status || 'pending',
+  statusColor: a.status === 'approved' ? 'success' : 'warning',
+}));
 
 const quickActions = [
   { name: 'Create Exam', icon: 'clipboard', href: '/admin/exams', color: 'primary' },
-  { name: 'Add Question', icon: 'question', href: '/admin/exams', color: 'secondary' },
   { name: 'Publish Notice', icon: 'bell', href: '/admin/notices', color: 'warning' },
   { name: 'Manage Students', icon: 'users', href: '/admin/students', color: 'success' },
   { name: 'View Admissions', icon: 'user-plus', href: '/admin/admissions', color: 'info' },
   { name: 'Upload Material', icon: 'book', href: '/admin/materials', color: 'purple' },
 ];
-
-const recentAdmissions = [
-  { name: 'Fatima Rahman', grade: '10', date: 'Sep 15, 2026', status: 'Approved', statusColor: 'success' },
-  { name: 'Karim Hossain', grade: '8', date: 'Sep 15, 2026', status: 'Pending', statusColor: 'warning' },
-  { name: 'Ayesha Khan', grade: '9', date: 'Sep 14, 2026', status: 'Approved', statusColor: 'success' },
-  { name: 'Rakib Hasan', grade: '7', date: 'Sep 14, 2026', status: 'Pending', statusColor: 'warning' },
-  { name: 'Sumaiya Akter', grade: '10', date: 'Sep 13, 2026', status: 'Approved', statusColor: 'success' },
-];
-
-const systemStats = [
-  { label: 'Database Records', value: '24,891' },
-  { label: 'Storage Used', value: '2.4 GB' },
-  { label: 'Server Uptime', value: '99.8%' },
-  { label: 'Active Sessions', value: '89' },
-];
 ---
 
 <AdminLayout title="Dashboard" adminName="Admin">
-  <!-- Welcome Header -->
   <div class="card p-6 lg:p-8 mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 text-white border-0">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       <div>
@@ -61,72 +82,88 @@ const systemStats = [
       </div>
       <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3">
         <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-        <span class="text-sm text-white/90">System Online — All Services Running</span>
+        <span class="text-sm text-white/90">System Online</span>
       </div>
     </div>
   </div>
 
-  <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-    {stats.map((stat) => (
-      <div class="card p-5 hover:shadow-lg transition-shadow">
-        <div class="flex items-center justify-between mb-3">
-          <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            stat.color === 'primary' ? 'bg-primary-100 text-primary-600' :
-            stat.color === 'secondary' ? 'bg-secondary-100 text-secondary-600' :
-            stat.color === 'success' ? 'bg-green-100 text-green-600' :
-            stat.color === 'warning' ? 'bg-amber-100 text-amber-600' :
-            stat.color === 'info' ? 'bg-blue-100 text-blue-600' :
-            'bg-purple-100 text-purple-600'
-          }`}>
-            {stat.icon === 'users' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
-            {stat.icon === 'clipboard' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            )}
-            {stat.icon === 'chart' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            )}
-            {stat.icon === 'user-plus' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-            )}
-            {stat.icon === 'bell' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            )}
-            {stat.icon === 'book' && (
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            )}
-          </div>
-          <span class={`text-xs font-semibold ${stat.changeType === 'up' ? 'text-green-600' : 'text-red-500'}`}>
-            {stat.change}
-          </span>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
         </div>
-        <p class="text-2xl font-bold text-slate-900 mb-1">{stat.value}</p>
-        <p class="text-sm text-slate-500">{stat.label}</p>
       </div>
-    ))}
+      <p class="text-2xl font-bold text-slate-900 mb-1">{totalStudents.toLocaleString()}</p>
+      <p class="text-sm text-slate-500">Total Students</p>
+    </div>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold text-slate-900 mb-1">{activeExams}</p>
+      <p class="text-sm text-slate-500">Active Exams</p>
+    </div>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold text-slate-900 mb-1">{totalResults.toLocaleString()}</p>
+      <p class="text-sm text-slate-500">Total Results</p>
+    </div>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold text-slate-900 mb-1">{pendingAdmissions}</p>
+      <p class="text-sm text-slate-500">Pending Admissions</p>
+    </div>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold text-slate-900 mb-1">{publishedNotices}</p>
+      <p class="text-sm text-slate-500">Published Notices</p>
+    </div>
+    <div class="card p-5 hover:shadow-lg transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold text-slate-900 mb-1">{studyMaterials}</p>
+      <p class="text-sm text-slate-500">Study Materials</p>
+    </div>
   </div>
 
-  <!-- Recent Activity & Charts Row -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-    <!-- Recent Activity -->
     <div class="lg:col-span-1 card p-6">
       <h3 class="text-lg font-bold text-slate-900 mb-5">Recent Activity</h3>
       <div class="space-y-4">
-        {recentActivity.map((activity) => (
+        {recentActivity.length === 0 ? (
+          <p class="text-sm text-slate-400 text-center py-4">No recent activity</p>
+        ) : (
+        recentActivity.map((activity) => (
           <div class="flex items-start gap-3">
             <div class={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
               activity.color === 'success' ? 'bg-green-100 text-green-600' :
@@ -154,88 +191,48 @@ const systemStats = [
               <p class="text-xs text-slate-400 mt-1">{activity.time}</p>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Students by Grade - Bar Chart Placeholder -->
-      <div class="card p-6">
-        <h3 class="text-lg font-bold text-slate-900 mb-5">Students by Grade</h3>
-        <div class="flex items-end justify-between h-48 gap-2 px-2">
-          <div class="flex flex-col items-center gap-2 flex-1">
-            <div class="w-full bg-primary-500 rounded-t-md" style="height: 65%"></div>
-            <span class="text-xs text-slate-500 font-medium">Grade 7</span>
-            <span class="text-xs font-bold text-slate-900">189</span>
+    <div class="lg:col-span-2 card p-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-5">Overview</h3>
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Students</span>
+            <span class="text-sm font-bold text-slate-900">{totalStudents}</span>
           </div>
-          <div class="flex flex-col items-center gap-2 flex-1">
-            <div class="w-full bg-primary-500 rounded-t-md" style="height: 78%"></div>
-            <span class="text-xs text-slate-500 font-medium">Grade 8</span>
-            <span class="text-xs font-bold text-slate-900">234</span>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-1">
-            <div class="w-full bg-primary-500 rounded-t-md" style="height: 90%"></div>
-            <span class="text-xs text-slate-500 font-medium">Grade 9</span>
-            <span class="text-xs font-bold text-slate-900">312</span>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-1">
-            <div class="w-full bg-primary-500 rounded-t-md" style="height: 100%"></div>
-            <span class="text-xs text-slate-500 font-medium">Grade 10</span>
-            <span class="text-xs font-bold text-slate-900">387</span>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-1">
-            <div class="w-full bg-secondary-500 rounded-t-md" style="height: 45%"></div>
-            <span class="text-xs text-slate-500 font-medium">HSC</span>
-            <span class="text-xs font-bold text-slate-900">125</span>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500" style={`width: ${Math.min(100, totalStudents / 10)}%`}></div>
           </div>
         </div>
-      </div>
-
-      <!-- Exam Results Trend - Line Chart Placeholder -->
-      <div class="card p-6">
-        <h3 class="text-lg font-bold text-slate-900 mb-5">Exam Results Trend</h3>
-        <div class="relative h-48">
-          <!-- Grid lines -->
-          <div class="absolute inset-0 flex flex-col justify-between">
-            <div class="border-b border-slate-100"></div>
-            <div class="border-b border-slate-100"></div>
-            <div class="border-b border-slate-100"></div>
-            <div class="border-b border-slate-100"></div>
-            <div class="border-b border-slate-100"></div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Completed Results</span>
+            <span class="text-sm font-bold text-slate-900">{totalResults}</span>
           </div>
-          <!-- SVG line chart -->
-          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
-            <!-- Area fill -->
-            <path d="M0,140 L80,100 L160,120 L240,60 L320,80 L400,30 L400,200 L0,200 Z" class="fill-primary-100" />
-            <!-- Line -->
-            <polyline points="0,140 80,100 160,120 240,60 320,80 400,30" fill="none" stroke="currentColor" stroke-width="3" class="text-primary-500" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Dots -->
-            <circle cx="0" cy="140" r="4" class="fill-primary-500" />
-            <circle cx="80" cy="100" r="4" class="fill-primary-500" />
-            <circle cx="160" cy="120" r="4" class="fill-primary-500" />
-            <circle cx="240" cy="60" r="4" class="fill-primary-500" />
-            <circle cx="320" cy="80" r="4" class="fill-primary-500" />
-            <circle cx="400" cy="30" r="4" class="fill-primary-500" />
-          </svg>
-          <!-- Labels -->
-          <div class="absolute bottom-0 left-0 right-0 flex justify-between px-2 translate-y-6">
-            <span class="text-xs text-slate-400">Jan</span>
-            <span class="text-xs text-slate-400">Feb</span>
-            <span class="text-xs text-slate-400">Mar</span>
-            <span class="text-xs text-slate-400">Apr</span>
-            <span class="text-xs text-slate-400">May</span>
-            <span class="text-xs text-slate-400">Jun</span>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-500" style={`width: ${Math.min(100, totalResults / 50)}%`}></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Pending Admissions</span>
+            <span class="text-sm font-bold text-slate-900">{pendingAdmissions}</span>
+          </div>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500" style={`width: ${Math.min(100, pendingAdmissions * 5)}%`}></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Quick Actions -->
   <div class="mb-6">
     <h3 class="text-lg font-bold text-slate-900 mb-4">Quick Actions</h3>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       {quickActions.map((action) => (
         <a
           href={action.href}
@@ -259,11 +256,6 @@ const systemStats = [
             {action.icon === 'clipboard' && (
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            )}
-            {action.icon === 'question' && (
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
             {action.icon === 'bell' && (
@@ -293,16 +285,19 @@ const systemStats = [
     </div>
   </div>
 
-  <!-- Recent Admissions & System Overview Row -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Recent Admissions Table -->
     <div class="lg:col-span-2 card overflow-hidden">
       <div class="p-6 pb-0">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-bold text-slate-900">Recent Admissions</h3>
-          <a href="/admin/admissions" class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">View All →</a>
+          <a href="/admin/admissions" class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">View All</a>
         </div>
       </div>
+      {recentAdmissions.length === 0 ? (
+        <div class="text-center py-8">
+          <p class="text-slate-400 text-sm">No recent admissions</p>
+        </div>
+      ) : (
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
@@ -319,7 +314,7 @@ const systemStats = [
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-secondary-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                      {admission.name.split(' ').map(n => n[0]).join('')}
+                      {admission.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <span class="text-sm font-medium text-slate-900">{admission.name}</span>
                   </div>
@@ -344,31 +339,39 @@ const systemStats = [
           </tbody>
         </table>
       </div>
+      )}
     </div>
 
-    <!-- System Overview -->
     <div class="card p-6">
       <h3 class="text-lg font-bold text-slate-900 mb-5">System Overview</h3>
       <div class="space-y-5">
-        {systemStats.map((stat) => (
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-slate-600">{stat.label}</span>
-              <span class="text-sm font-bold text-slate-900">{stat.value}</span>
-            </div>
-            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                class="h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                style={`width: ${
-                  stat.label === 'Database Records' ? '72%' :
-                  stat.label === 'Storage Used' ? '48%' :
-                  stat.label === 'Server Uptime' ? '99.8%' :
-                  '35%'
-                }`}
-              ></div>
-            </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Total Students</span>
+            <span class="text-sm font-bold text-slate-900">{totalStudents}</span>
           </div>
-        ))}
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500" style={`width: ${Math.min(100, totalStudents / 10)}%`}></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Published Notices</span>
+            <span class="text-sm font-bold text-slate-900">{publishedNotices}</span>
+          </div>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-500" style={`width: ${Math.min(100, publishedNotices * 5)}%`}></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-slate-600">Study Materials</span>
+            <span class="text-sm font-bold text-slate-900">{studyMaterials}</span>
+          </div>
+          <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500" style={`width: ${Math.min(100, studyMaterials * 5)}%`}></div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-6 p-4 bg-slate-50 rounded-xl">

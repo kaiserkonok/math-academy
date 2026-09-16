@@ -1,24 +1,28 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
-const notices = [
-  { id: 'NTC-001', title: 'Annual Math Olympiad 2026', content: 'Math Solution & Exam Center Mymensingh is organizing the Annual Math Olympiad 2026. All students from Class 9 to HSC are eligible to participate. Registration deadline is September 30, 2026.', important: true, date: '2026-09-12', hasPdf: true, pdfName: 'olympiad_brochure.pdf' },
-  { id: 'NTC-002', title: 'Holiday Notice - Eid-ul-Adha Vacation', content: 'The center will remain closed from September 20 to September 25, 2026 on account of Eid-ul-Adha. Regular classes will resume from September 26, 2026.', important: true, date: '2026-09-10', hasPdf: false, pdfName: '' },
-  { id: 'NTC-003', title: 'New Batch Starting for SSC 2027', content: 'A new preparation batch for SSC Examination 2027 is starting from October 1, 2026. Limited seats available. Early registration discount available until September 25.', important: false, date: '2026-09-08', hasPdf: true, pdfName: 'batch_schedule.pdf' },
-  { id: 'NTC-004', title: 'Mid-Term Exam Schedule Released', content: 'The mid-term examination schedule for all classes has been published. Exams will be held from October 5 to October 15, 2026. Students are advised to prepare accordingly.', important: false, date: '2026-09-05', hasPdf: true, pdfName: 'exam_schedule.pdf' },
-  { id: 'NTC-005', title: 'Parent-Teacher Meeting Announcement', content: 'A parent-teacher meeting is scheduled for September 22, 2026 from 10:00 AM to 2:00 PM. Parents of all students are cordially invited to attend and discuss their ward\'s progress.', important: false, date: '2026-09-03', hasPdf: false, pdfName: '' },
-  { id: 'NTC-006', title: 'Scholarship Test for Meritorious Students', content: 'Math Solution & Exam Center Mymensingh announces scholarship test for top-performing students. Selected students will receive up to 50% tuition fee waiver. Test date: October 20, 2026.', important: true, date: '2026-09-01', hasPdf: true, pdfName: 'scholarship_info.pdf' },
-  { id: 'NTC-007', title: 'Updated Classroom Rules & Regulations', content: 'Updated rules and regulations for the academic session 2026-2027 have been posted on the notice board. All students must read and follow the updated guidelines strictly.', important: false, date: '2026-08-28', hasPdf: true, pdfName: 'rules_2026.pdf' },
-  { id: 'NTC-008', title: 'Special Coaching for HSC Candidates', content: 'Special coaching classes for HSC examination candidates will begin from October 10, 2026. Sessions will cover all major math topics with focus on problem-solving techniques.', important: false, date: '2026-08-25', hasPdf: false, pdfName: '' },
-];
+const { data: noticesData } = await supabase
+  .from('notices')
+  .select('*')
+  .order('published_at', { ascending: false });
+
+const notices = (noticesData || []).map(n => ({
+  id: `NTC-${String(n.id).padStart(3, '0')}`,
+  title: n.title || 'Untitled',
+  content: n.content || '',
+  important: n.is_important || false,
+  date: n.published_at ? new Date(n.published_at).toISOString().split('T')[0] : 'N/A',
+  hasPdf: !!n.pdf_url,
+  pdfName: n.pdf_url ? n.pdf_url.split('/').pop() || '' : '',
+}));
 
 const importantCount = notices.filter(n => n.important).length;
 const withPdfCount = notices.filter(n => n.hasPdf).length;
-const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
 ---
 
 <AdminLayout title="Notice Management">
-  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Notice Management</h1>
@@ -35,8 +39,7 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
     </button>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
@@ -76,37 +79,16 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
         </div>
       </div>
     </div>
-    <div class="card p-5">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm text-slate-500">This Month</p>
-          <p class="text-2xl font-bold text-slate-900">{thisMonthCount}</p>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <!-- Notices Table -->
   <div class="card">
-    <!-- Filters -->
     <div class="p-5 border-b border-slate-100">
       <div class="flex flex-col lg:flex-row gap-4">
         <div class="flex-1 relative">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input
-            type="text"
-            placeholder="Search notices..."
-            class="input-field pl-10"
-            id="searchInput"
-            oninput="filterNotices()"
-          />
+          <input type="text" placeholder="Search notices..." class="input-field pl-10" id="searchInput" oninput="filterNotices()" />
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
           <select class="input-field w-full sm:w-40" id="importantFilter" onchange="filterNotices()">
@@ -123,7 +105,15 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
       </div>
     </div>
 
-    <!-- Table -->
+    {notices.length === 0 ? (
+      <div class="text-center py-16">
+        <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        <p class="text-slate-500 font-medium">No notices found</p>
+        <p class="text-sm text-slate-400 mt-1">Publish notices to keep students informed.</p>
+      </div>
+    ) : (
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -177,18 +167,7 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
               </td>
               <td class="px-5 py-4">
                 <div class="flex items-center gap-1">
-                  <button title="Edit" onclick={`editNotice('${notice.id}', '${notice.title.replace(/'/g, "\\'")}', '${notice.content.replace(/'/g, "\\'")}', ${notice.important}, '${notice.hasPdf}', '${notice.pdfName.replace(/'/g, "\\'")}')`} class="p-2 text-slate-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button title="View" onclick={`viewNotice('${notice.id}')`} class="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                  <button title="Delete" onclick={`deleteNotice('${notice.id}')`} class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button title="Delete" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -200,29 +179,15 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
         </tbody>
       </table>
     </div>
+    )}
 
-    <!-- Pagination -->
     <div class="p-5 border-t border-slate-100">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
         <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-{notices.length}</span> of <span class="font-semibold text-slate-700">{notices.length}</span> notices</p>
-        <div class="flex items-center gap-1">
-          <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
-          <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- Publish/Edit Notice Modal -->
   <div id="noticeModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg mx-4">
@@ -246,39 +211,6 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Content</label>
             <textarea id="noticeContent" rows="5" required class="input-field" placeholder="Write the notice content here..."></textarea>
           </div>
-          <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700">Mark as Important</label>
-              <p class="text-xs text-slate-500 mt-0.5">Important notices are highlighted in red</p>
-            </div>
-            <button type="button" id="importantToggle" onclick="toggleImportant()" class="relative inline-flex h-7 w-12 items-center rounded-full bg-slate-300 transition-colors duration-200">
-              <span id="importantToggleDot" class="inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 translate-x-1" />
-            </button>
-            <input type="hidden" id="noticeImportant" value="false" />
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">PDF Attachment (Optional)</label>
-            <div class="relative">
-              <input type="file" id="noticePdf" accept=".pdf" class="hidden" onchange="handlePdfChange()" />
-              <button type="button" onclick="document.getElementById('noticePdf').click()" class="w-full flex items-center gap-3 px-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-primary-400 hover:text-primary-600 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <span id="pdfLabel" class="text-sm">Choose a PDF file</span>
-              </button>
-              <div id="pdfPreview" class="hidden mt-2 flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                </svg>
-                <span id="pdfName" class="text-sm text-green-700 font-medium"></span>
-                <button type="button" onclick="removePdf()" class="ml-auto text-green-600 hover:text-red-600 transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
           <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
               Cancel
@@ -288,51 +220,6 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
             </button>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- View Notice Modal -->
-  <div id="viewNoticeModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeViewModal()"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl mx-4">
-      <div class="card p-0 overflow-hidden animate-in">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 id="viewModalTitle" class="text-lg font-bold text-slate-900">Notice Details</h3>
-          <button onclick="closeViewModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <span id="viewImportantBadge" class="hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-700">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-              Important
-            </span>
-            <span id="viewDate" class="text-sm text-slate-500"></span>
-          </div>
-          <h4 id="viewContentTitle" class="text-xl font-bold text-slate-900 mb-4"></h4>
-          <p id="viewContentBody" class="text-slate-600 leading-relaxed mb-4"></p>
-          <div id="viewPdfSection" class="hidden p-4 bg-green-50 rounded-xl">
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-              </svg>
-              <div>
-                <p class="text-sm font-semibold text-green-700">PDF Attachment</p>
-                <p id="viewPdfName" class="text-xs text-green-600"></p>
-              </div>
-              <a id="viewPdfDownload" href="#" download class="ml-auto px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors">Download</a>
-            </div>
-          </div>
-        </div>
-        <div class="px-6 py-4 border-t border-slate-100 flex justify-end">
-          <button onclick="closeViewModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">Close</button>
-        </div>
       </div>
     </div>
   </div>
@@ -348,117 +235,16 @@ const thisMonthCount = notices.filter(n => n.date.startsWith('2026-09')).length;
   </style>
 
   <script is:inline>
-    const notices = [
-      { id: 'NTC-001', title: 'Annual Math Olympiad 2026', content: 'Math Solution & Exam Center Mymensingh is organizing the Annual Math Olympiad 2026. All students from Class 9 to HSC are eligible to participate. Registration deadline is September 30, 2026.', important: true, date: '2026-09-12', hasPdf: true, pdfName: 'olympiad_brochure.pdf' },
-      { id: 'NTC-002', title: 'Holiday Notice - Eid-ul-Adha Vacation', content: 'The center will remain closed from September 20 to September 25, 2026 on account of Eid-ul-Adha. Regular classes will resume from September 26, 2026.', important: true, date: '2026-09-10', hasPdf: false, pdfName: '' },
-      { id: 'NTC-003', title: 'New Batch Starting for SSC 2027', content: 'A new preparation batch for SSC Examination 2027 is starting from October 1, 2026. Limited seats available. Early registration discount available until September 25.', important: false, date: '2026-09-08', hasPdf: true, pdfName: 'batch_schedule.pdf' },
-      { id: 'NTC-004', title: 'Mid-Term Exam Schedule Released', content: 'The mid-term examination schedule for all classes has been published. Exams will be held from October 5 to October 15, 2026. Students are advised to prepare accordingly.', important: false, date: '2026-09-05', hasPdf: true, pdfName: 'exam_schedule.pdf' },
-      { id: 'NTC-005', title: 'Parent-Teacher Meeting Announcement', content: 'A parent-teacher meeting is scheduled for September 22, 2026 from 10:00 AM to 2:00 PM. Parents of all students are cordially invited to attend and discuss their ward\'s progress.', important: false, date: '2026-09-03', hasPdf: false, pdfName: '' },
-      { id: 'NTC-006', title: 'Scholarship Test for Meritorious Students', content: 'Math Solution & Exam Center Mymensingh announces scholarship test for top-performing students. Selected students will receive up to 50% tuition fee waiver. Test date: October 20, 2026.', important: true, date: '2026-09-01', hasPdf: true, pdfName: 'scholarship_info.pdf' },
-      { id: 'NTC-007', title: 'Updated Classroom Rules & Regulations', content: 'Updated rules and regulations for the academic session 2026-2027 have been posted on the notice board. All students must read and follow the updated guidelines strictly.', important: false, date: '2026-08-28', hasPdf: true, pdfName: 'rules_2026.pdf' },
-      { id: 'NTC-008', title: 'Special Coaching for HSC Candidates', content: 'Special coaching classes for HSC examination candidates will begin from October 10, 2026. Sessions will cover all major math topics with focus on problem-solving techniques.', important: false, date: '2026-08-25', hasPdf: false, pdfName: '' },
-    ];
-
     function openModal() {
       document.getElementById('formAction').value = 'add';
       document.getElementById('editNoticeId').value = '';
       document.getElementById('modalTitle').textContent = 'Publish New Notice';
       document.getElementById('noticeForm').reset();
-      document.getElementById('noticeImportant').value = 'false';
-      updateImportantToggle(false);
-      removePdf();
       document.getElementById('noticeModal').classList.remove('hidden');
     }
 
     function closeModal() {
       document.getElementById('noticeModal').classList.add('hidden');
-    }
-
-    function openViewModal() {
-      document.getElementById('viewNoticeModal').classList.remove('hidden');
-    }
-
-    function closeViewModal() {
-      document.getElementById('viewNoticeModal').classList.add('hidden');
-    }
-
-    function editNotice(id, title, content, important, hasPdf, pdfName) {
-      document.getElementById('formAction').value = 'edit';
-      document.getElementById('editNoticeId').value = id;
-      document.getElementById('modalTitle').textContent = 'Edit Notice';
-      document.getElementById('noticeTitle').value = title;
-      document.getElementById('noticeContent').value = content;
-      document.getElementById('noticeImportant').value = String(important);
-      updateImportantToggle(important);
-      if (hasPdf === 'true' && pdfName) {
-        document.getElementById('pdfLabel').textContent = pdfName;
-        document.getElementById('pdfPreview').classList.remove('hidden');
-      } else {
-        removePdf();
-      }
-      document.getElementById('noticeModal').classList.remove('hidden');
-    }
-
-    function viewNotice(id) {
-      const notice = notices.find(n => n.id === id);
-      if (!notice) return;
-      document.getElementById('viewModalTitle').textContent = 'Notice Details';
-      document.getElementById('viewContentTitle').textContent = notice.title;
-      document.getElementById('viewContentBody').textContent = notice.content;
-      document.getElementById('viewDate').textContent = 'Published: ' + notice.date;
-      if (notice.important) {
-        document.getElementById('viewImportantBadge').classList.remove('hidden');
-      } else {
-        document.getElementById('viewImportantBadge').classList.add('hidden');
-      }
-      if (notice.hasPdf) {
-        document.getElementById('viewPdfSection').classList.remove('hidden');
-        document.getElementById('viewPdfName').textContent = notice.pdfName;
-        document.getElementById('viewPdfDownload').href = '/notices/' + notice.pdfName;
-      } else {
-        document.getElementById('viewPdfSection').classList.add('hidden');
-      }
-      document.getElementById('viewNoticeModal').classList.remove('hidden');
-    }
-
-    function toggleImportant() {
-      const current = document.getElementById('noticeImportant').value === 'true';
-      const next = !current;
-      document.getElementById('noticeImportant').value = String(next);
-      updateImportantToggle(next);
-    }
-
-    function updateImportantToggle(isImportant) {
-      const toggle = document.getElementById('importantToggle');
-      const dot = document.getElementById('importantToggleDot');
-      if (isImportant) {
-        toggle.classList.remove('bg-slate-300');
-        toggle.classList.add('bg-red-500');
-        dot.classList.add('translate-x-5');
-        dot.classList.remove('translate-x-1');
-      } else {
-        toggle.classList.add('bg-slate-300');
-        toggle.classList.remove('bg-red-500');
-        dot.classList.remove('translate-x-5');
-        dot.classList.add('translate-x-1');
-      }
-    }
-
-    function handlePdfChange() {
-      const input = document.getElementById('noticePdf');
-      if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        document.getElementById('pdfLabel').textContent = file.name;
-        document.getElementById('pdfPreview').classList.remove('hidden');
-        document.getElementById('pdfName').textContent = file.name;
-      }
-    }
-
-    function removePdf() {
-      const input = document.getElementById('noticePdf');
-      input.value = '';
-      document.getElementById('pdfLabel').textContent = 'Choose a PDF file';
-      document.getElementById('pdfPreview').classList.add('hidden');
     }
 
     function handleSubmit(e) {

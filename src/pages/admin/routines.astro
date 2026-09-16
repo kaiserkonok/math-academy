@@ -1,18 +1,24 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
-const routines = [
-  { id: 'RUT-001', title: 'Class 9 Algebra - Chapter 3', grade: 'Class 9', chapter: 'Algebra', type: 'Class', date: '2026-09-15', startTime: '08:00', endTime: '09:30', description: 'Quadratic equations and solutions' },
-  { id: 'RUT-002', title: 'Class 10 Geometry - Chapter 5', grade: 'Class 10', chapter: 'Geometry', type: 'Class', date: '2026-09-15', startTime: '10:00', endTime: '11:30', description: 'Triangle properties and proofs' },
-  { id: 'RUT-003', title: 'Class 10 Algebra - Mid-term Exam', grade: 'Class 10', chapter: 'Algebra', type: 'Exam', date: '2026-09-18', startTime: '09:00', endTime: '12:00', description: 'Full algebra mid-term assessment' },
-  { id: 'RUT-004', title: 'Class 9 Trigonometry - Chapter 4', grade: 'Class 9', chapter: 'Trigonometry', type: 'Class', date: '2026-09-16', startTime: '08:00', endTime: '09:30', description: 'Introduction to trigonometric ratios' },
-  { id: 'RUT-005', title: 'Class 10 Calculus - Chapter 7', grade: 'Class 10', chapter: 'Calculus', type: 'Class', date: '2026-09-17', startTime: '10:00', endTime: '11:30', description: 'Derivatives and limits' },
-  { id: 'RUT-006', title: 'Class 10 Preparation - Mock Test', grade: 'Class 10', chapter: 'Mixed', type: 'Exam', date: '2026-09-19', startTime: '14:00', endTime: '16:00', description: 'Comprehensive mock test for Class 10 candidates' },
-  { id: 'RUT-007', title: 'Class 9 Statistics - Chapter 6', grade: 'Class 9', chapter: 'Statistics', type: 'Class', date: '2026-09-16', startTime: '11:00', endTime: '12:30', description: 'Data analysis and probability basics' },
-  { id: 'RUT-008', title: 'Class 10 Advanced Math - Chapter 9', grade: 'Class 10', chapter: 'Advanced Math', type: 'Class', date: '2026-09-18', startTime: '14:00', endTime: '16:00', description: 'Complex numbers and vectors' },
-  { id: 'RUT-009', title: 'Class 10 Arithmetic - Chapter 2', grade: 'Class 10', chapter: 'Arithmetic', type: 'Class', date: '2026-09-17', startTime: '08:00', endTime: '09:30', description: 'Percentages and profit/loss' },
-  { id: 'RUT-010', title: 'Class 10 Math - Unit Test', grade: 'Class 10', chapter: 'Algebra', type: 'Exam', date: '2026-09-20', startTime: '10:00', endTime: '12:00', description: 'Algebra and geometry unit assessment' },
-];
+const { data: routinesData } = await supabase
+  .from('routines')
+  .select('*')
+  .order('date', { ascending: true });
+
+const routines = (routinesData || []).map(r => ({
+  id: `RUT-${String(r.id).padStart(3, '0')}`,
+  title: r.title || 'Untitled',
+  grade: r.grade || 'N/A',
+  chapter: r.chapter || 'N/A',
+  type: r.routine_type || 'Class',
+  date: r.date || 'N/A',
+  startTime: r.start_time || '00:00',
+  endTime: r.end_time || '00:00',
+  description: r.description || '',
+}));
 
 const classRoutines = routines.filter(r => r.type === 'Class');
 const examRoutines = routines.filter(r => r.type === 'Exam');
@@ -29,7 +35,6 @@ const typeColors: Record<string, string> = {
 ---
 
 <AdminLayout title="Routine Management">
-  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Routine Management</h1>
@@ -46,7 +51,6 @@ const typeColors: Record<string, string> = {
     </button>
   </div>
 
-  <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-4">
@@ -96,13 +100,12 @@ const typeColors: Record<string, string> = {
         </div>
         <div>
           <p class="text-sm text-slate-500">This Week</p>
-          <p class="text-2xl font-bold text-slate-900">6</p>
+          <p class="text-2xl font-bold text-slate-900">{routines.length}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tabs -->
   <div class="card mb-6">
     <div class="border-b border-slate-100">
       <nav class="flex gap-0">
@@ -125,22 +128,14 @@ const typeColors: Record<string, string> = {
       </nav>
     </div>
 
-    <!-- Table View -->
     <div id="view-table">
-      <!-- Filters -->
       <div class="p-5 border-b border-slate-100">
         <div class="flex flex-col lg:flex-row gap-4">
           <div class="flex-1 relative">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input
-              type="text"
-              placeholder="Search routines..."
-              class="input-field pl-10"
-              id="searchInput"
-              oninput="filterRoutines()"
-            />
+            <input type="text" placeholder="Search routines..." class="input-field pl-10" id="searchInput" oninput="filterRoutines()" />
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
             <select class="input-field w-full sm:w-40" id="gradeFilter" onchange="filterRoutines()">
@@ -157,7 +152,15 @@ const typeColors: Record<string, string> = {
         </div>
       </div>
 
-      <!-- Table -->
+      {routines.length === 0 ? (
+        <div class="text-center py-16">
+          <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-slate-500 font-medium">No routines found</p>
+          <p class="text-sm text-slate-400 mt-1">Add routines to schedule classes and exams.</p>
+        </div>
+      ) : (
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
@@ -197,12 +200,12 @@ const typeColors: Record<string, string> = {
                 <td class="px-5 py-4 text-sm text-slate-600">{routine.endTime}</td>
                 <td class="px-5 py-4">
                   <div class="flex items-center gap-1">
-                    <button title="Edit" onclick={`editRoutine('${routine.id}', '${routine.title.replace(/'/g, "\\'")}', '${routine.grade}', '${routine.chapter.replace(/'/g, "\\'")}', '${routine.type}', '${routine.date}', '${routine.startTime}', '${routine.endTime}', '${routine.description.replace(/'/g, "\\'")}')`} class="p-2 text-slate-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors">
+                    <button title="Edit" class="p-2 text-slate-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
-                    <button title="Delete" onclick={`deleteRoutine('${routine.id}')`} class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <button title="Delete" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -214,30 +217,15 @@ const typeColors: Record<string, string> = {
           </tbody>
         </table>
       </div>
+      )}
 
-      <!-- Pagination -->
       <div class="p-5 border-t border-slate-100">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-{routines.length}</span> of <span class="font-semibold text-slate-700">{routines.length}</span> routines</p>
-          <div class="flex items-center gap-1">
-            <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
-            <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">2</button>
-            <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- Weekly View -->
     <div id="view-weekly" class="hidden p-5">
       <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
         {weekDays.map((day) => {
@@ -276,7 +264,6 @@ const typeColors: Record<string, string> = {
     </div>
   </div>
 
-  <!-- Add/Edit Routine Modal -->
   <div id="routineModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg mx-4">
@@ -385,21 +372,6 @@ const typeColors: Record<string, string> = {
 
     function closeModal() {
       document.getElementById('routineModal').classList.add('hidden');
-    }
-
-    function editRoutine(id, title, grade, chapter, type, date, startTime, endTime, description) {
-      document.getElementById('formAction').value = 'edit';
-      document.getElementById('editRoutineId').value = id;
-      document.getElementById('modalTitle').textContent = 'Edit Routine';
-      document.getElementById('routineTitle').value = title;
-      document.getElementById('routineGrade').value = grade;
-      document.getElementById('routineChapter').value = chapter;
-      document.getElementById('routineType').value = type;
-      document.getElementById('routineDate').value = date;
-      document.getElementById('routineStartTime').value = startTime;
-      document.getElementById('routineEndTime').value = endTime;
-      document.getElementById('routineDescription').value = description;
-      document.getElementById('routineModal').classList.remove('hidden');
     }
 
     function handleSubmit(e) {

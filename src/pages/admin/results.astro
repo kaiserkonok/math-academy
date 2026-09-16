@@ -1,27 +1,46 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { createClient } from '../../lib/supabase-server';
+const { supabase } = createClient(Astro.request, Astro.cookies);
 
-const results = [
-  { id: 'RES-001', studentName: 'Tanvir Hossain', studentId: 'STU-2024-001', examTitle: 'Class 10 Model Test 1', grade: 10, totalMarks: 100, obtainedMarks: 87, percentage: 87, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-002', studentName: 'Fatema Khatun', studentId: 'STU-2024-002', examTitle: 'Class 10 Mock Exam 2', grade: 9, totalMarks: 100, obtainedMarks: 92, percentage: 92, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-003', studentName: 'Rakibul Hasan', studentId: 'STU-2024-003', examTitle: 'Class 10 Model Test 1', grade: 10, totalMarks: 100, obtainedMarks: 64, percentage: 64, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-004', studentName: 'Nusrat Jahan', studentId: 'STU-2024-004', examTitle: 'Class 9 Weekly Test 5', grade: 8, totalMarks: 100, obtainedMarks: 38, percentage: 38, status: 'fail', published: false, date: '2025-09-08' },
-  { id: 'RES-005', studentName: 'Imran Hossain', studentId: 'STU-2024-005', examTitle: 'Class 10 Mock Exam 2', grade: 9, totalMarks: 100, obtainedMarks: 76, percentage: 76, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-006', studentName: 'Sumaiya Akter', studentId: 'STU-2024-006', examTitle: 'Class 9 Weekly Test 5', grade: 10, totalMarks: 100, obtainedMarks: 95, percentage: 95, status: 'pass', published: true, date: '2025-09-08' },
-  { id: 'RES-007', studentName: 'Arif Rahman', studentId: 'STU-2024-007', examTitle: 'Class 10 Mock Exam 2', grade: 8, totalMarks: 100, obtainedMarks: 55, percentage: 55, status: 'fail', published: false, date: '2025-09-10' },
-  { id: 'RES-008', studentName: 'Tamanna Begum', studentId: 'STU-2024-008', examTitle: 'Class 10 Model Test 1', grade: 9, totalMarks: 100, obtainedMarks: 71, percentage: 71, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-009', studentName: 'Sakib Al Hasan', studentId: 'STU-2024-009', examTitle: 'Class 10 Mock Exam 2', grade: 10, totalMarks: 100, obtainedMarks: 83, percentage: 83, status: 'pass', published: true, date: '2025-09-10' },
-  { id: 'RES-010', studentName: 'Mst. Rabeya Khatun', studentId: 'STU-2024-010', examTitle: 'Class 9 Weekly Test 5', grade: 9, totalMarks: 100, obtainedMarks: 42, percentage: 42, status: 'fail', published: false, date: '2025-09-08' },
-];
+const { data: resultsData } = await supabase
+  .from('exam_attempts')
+  .select(`
+    id,
+    student_id,
+    exam_id,
+    total_marks,
+    obtained_marks,
+    percentage,
+    is_passed,
+    submitted_at,
+    profiles!inner(full_name, student_id, grade),
+    exams!inner(title)
+  `)
+  .eq('status', 'completed')
+  .order('submitted_at', { ascending: false });
+
+const results = (resultsData || []).map(r => ({
+  id: `RES-${r.id}`,
+  studentName: (r.profiles as any)?.full_name || 'Unknown',
+  studentId: (r.profiles as any)?.student_id || 'N/A',
+  examTitle: (r.exams as any)?.title || 'Unknown Exam',
+  grade: (r.profiles as any)?.grade || 0,
+  totalMarks: r.total_marks || 0,
+  obtainedMarks: r.obtained_marks || 0,
+  percentage: r.percentage || 0,
+  status: r.is_passed ? 'pass' : 'fail',
+  published: false,
+  date: r.submitted_at ? new Date(r.submitted_at).toISOString().split('T')[0] : 'N/A',
+}));
 
 const totalResults = results.length;
-const avgScore = Math.round(results.reduce((a, b) => a + b.percentage, 0) / results.length);
-const passRate = Math.round((results.filter(r => r.status === 'pass').length / totalResults) * 100);
-const highestScore = Math.max(...results.map(r => r.percentage));
+const avgScore = totalResults > 0 ? Math.round(results.reduce((a, b) => a + b.percentage, 0) / totalResults) : 0;
+const passRate = totalResults > 0 ? Math.round((results.filter(r => r.status === 'pass').length / totalResults) * 100) : 0;
+const highestScore = totalResults > 0 ? Math.max(...results.map(r => r.percentage)) : 0;
 ---
 
 <AdminLayout title="Result Management">
-  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Result Management</h1>
@@ -43,7 +62,6 @@ const highestScore = Math.max(...results.map(r => r.percentage));
     </div>
   </div>
 
-  <!-- Statistics Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-4">
@@ -99,7 +117,6 @@ const highestScore = Math.max(...results.map(r => r.percentage));
     </div>
   </div>
 
-  <!-- Filter Section -->
   <div class="card p-5 mb-6">
     <div class="flex flex-col lg:flex-row gap-4">
       <div class="flex-1 relative">
@@ -117,9 +134,6 @@ const highestScore = Math.max(...results.map(r => r.percentage));
       <div class="flex flex-col sm:flex-row gap-3">
         <select class="input-field w-full sm:w-40" id="examFilter" onchange="filterResults()">
           <option value="">All Exams</option>
-          <option value="Class 10 Model Test 1">Class 10 Model Test 1</option>
-          <option value="Class 9 Weekly Test 5">Class 9 Weekly Test 5</option>
-          <option value="Class 10 Mock Exam 2">Class 10 Mock Exam 2</option>
         </select>
         <select class="input-field w-full sm:w-36" id="gradeFilter" onchange="filterResults()">
           <option value="">All Grades</option>
@@ -140,7 +154,6 @@ const highestScore = Math.max(...results.map(r => r.percentage));
     </div>
   </div>
 
-  <!-- Bulk Actions -->
   <div id="bulkActions" class="hidden card p-4 mb-6 bg-primary-50 border-primary-200">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -160,8 +173,16 @@ const highestScore = Math.max(...results.map(r => r.percentage));
     </div>
   </div>
 
-  <!-- Results Table -->
   <div class="card overflow-hidden mb-6">
+    {results.length === 0 ? (
+      <div class="text-center py-16">
+        <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <p class="text-slate-500 font-medium">No results found</p>
+        <p class="text-sm text-slate-400 mt-1">Exam results will appear here once submitted.</p>
+      </div>
+    ) : (
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -272,26 +293,11 @@ const highestScore = Math.max(...results.map(r => r.percentage));
         </tbody>
       </table>
     </div>
+    )}
   </div>
 
-  <!-- Pagination -->
   <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-    <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-10</span> of <span class="font-semibold text-slate-700">{totalResults}</span> results</p>
-    <div class="flex items-center gap-1">
-      <button class="px-3 py-2 text-sm font-medium text-slate-400 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg">1</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">2</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">3</button>
-      <button class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
+    <p class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700">1-{totalResults}</span> of <span class="font-semibold text-slate-700">{totalResults}</span> results</p>
   </div>
 
   <script is:inline>
