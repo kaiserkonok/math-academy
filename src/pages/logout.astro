@@ -2,11 +2,9 @@
 import { createClient } from '../lib/supabase-server';
 const { supabase } = createClient(Astro.request, Astro.cookies);
 await supabase.auth.signOut();
-const cookies = Astro.cookies.getAll();
-for (const cookie of cookies) {
-  if (cookie.name.startsWith('sb-')) {
-    Astro.cookies.delete(cookie.name, { path: '/' });
-  }
-}
+const cookieHeader = Astro.request.headers.get('cookie') ?? '';
+cookieHeader.split(';').map(c => c.trim().split('=')[0]).filter(n => n.startsWith('sb-')).forEach(name => {
+  Astro.cookies.delete(name, { path: '/' });
+});
 return Astro.redirect('/');
 ---
